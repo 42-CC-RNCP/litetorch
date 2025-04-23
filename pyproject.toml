@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "ai-project"
+version = "0.1.0"
+description = "AI project environment"
+authors = ["LeaYeh <lea.yeh.ml@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+scikit-learn = "*"
+seaborn = "*"
+torch = "*"
+tensorflow = "*"
+transformers = "*"
+datasets = "*"
+opencv-python-headless = "*"
+plotly = "*"
+tqdm = "*"
+ipywidgets = "*"
+notebook = "*"
+jupyterlab = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

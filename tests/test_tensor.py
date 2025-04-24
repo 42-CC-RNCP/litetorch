@@ -20,7 +20,9 @@ def test_tensor_init_from_list():
     assert isinstance(tensor.data, np.ndarray), "Tensor data should be a numpy array."
     assert tensor.shape == (2, 2), "Tensor shape should be (2, 2)."
     assert tensor.auto_grad is False, "Tensor should not track gradients by default."
-    assert np.array_equal(tensor.data, np.array(data)), "Tensor data should match the input list."
+    assert np.array_equal(
+        tensor.data, np.array(data)
+    ), "Tensor data should match the input list."
 
 
 def test_tensor_init_from_numpy():
@@ -31,7 +33,9 @@ def test_tensor_init_from_numpy():
     tensor = Tensor(data)
     assert isinstance(tensor.data, np.ndarray), "Tensor data should be a numpy array."
     assert tensor.shape == (2, 2), "Tensor shape should be (2, 2)."
-    assert np.array_equal(tensor.data, data), "Tensor data should match the input numpy array."
+    assert np.array_equal(
+        tensor.data, data
+    ), "Tensor data should match the input numpy array."
 
 
 def test_tensor_init_from_list_with_autograd():
@@ -63,4 +67,6 @@ def test_tensor_repr():
     data = [[1, 2], [3, 4]]
     tensor = Tensor(data)
     expected_repr = f"Tensor(data={tensor.data}, shape={tensor.shape}, requires_grad={tensor.auto_grad})"
-    assert repr(tensor) == expected_repr, "Tensor representation does not match expected format."
+    assert (
+        repr(tensor) == expected_repr
+    ), "Tensor representation does not match expected format."

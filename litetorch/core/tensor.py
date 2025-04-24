@@ -11,6 +11,7 @@ Date: 2025-04-24
 import numpy as np
 from typing import List, Union
 
+
 class Tensor:
     def __init__(self, data: Union[List, np.ndarray], requires_grad: bool = False):
         """
@@ -28,7 +29,7 @@ class Tensor:
 
         self._backward = lambda: None
         self._prev = set()
-        self._op = ''
+        self._op = ""
 
     def __repr__(self):
         """

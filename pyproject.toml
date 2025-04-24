@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "ai-project"
+name = "litetorch"
 version = "0.1.0"
-description = "AI project environment"
+description = "A homemade deep learning framework for learning"
 authors = ["LeaYeh <lea.yeh.ml@gmail.com>"]
 
 [tool.poetry.dependencies]
@@ -21,6 +21,9 @@ tqdm = "*"
 ipywidgets = "*"
 notebook = "*"
 jupyterlab = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
 
 [build-system]
 requires = ["poetry-core"]

@@ -29,6 +29,10 @@ class Linear(Module):
         self.out_features = out_features
         self.bias = bias
 
+        # Xavier initialization for weights
+        # The weights are initialized using a normal distribution with mean 0 and standard deviation
+        # sqrt(2 / in_features) to help with convergence.
+        # This is a common practice for initializing weights in deep learning to avoid vanishing/exploding gradients.
         self.weight = Tensor(
             np.random.randn(in_features, out_features) * np.sqrt(2.0 / in_features),
             requires_grad=True,

@@ -28,7 +28,6 @@
     ],
     "postCreateCommand": ".devcontainer/install.sh",
     "workspaceFolder": "/workspace",
-    "initializeCommand": "docker network inspect share_network >/dev/null 2>&1 || docker network create share_network",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "remoteUser": "root"
 }

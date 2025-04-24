@@ -17,7 +17,8 @@
                 "ms-python.vscode-pylance",
                 "ms-toolsai.jupyter",
                 "github.copilot",
-                "eamodio.gitlens"
+                "eamodio.gitlens",
+                "mikoz.black-py"
             ]
         }
     },

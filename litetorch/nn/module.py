@@ -33,7 +33,7 @@ class Module:
     def forward(self, x) -> Tensor:
         raise NotImplementedError("Forward method not implemented.")
 
-    def backward(self, grad_output: Tensor) -> None:
+    def backward(self, grad_output: Tensor) -> Tensor:
         raise NotImplementedError("Backward method not implemented.")
 
     def parameters(self) -> List[Tensor]:

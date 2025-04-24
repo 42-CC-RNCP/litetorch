@@ -12,4 +12,4 @@ export PATH="/root/.local/bin:$PATH"
 
 cd /workspace
 poetry config virtualenvs.in-project true
-poetry install || true
+poetry install --with dev

@@ -17,5 +17,8 @@ jobs:
       - name: Build Docker Image
         run: docker build -t litetorch-ci .
 
+      - name: Install dependencies
+        run: docker run --rm litetorch-ci poetry install --with dev
+
       - name: Run Tests
         run: docker run --rm litetorch-ci poetry run pytest

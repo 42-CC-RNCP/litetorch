@@ -36,3 +36,29 @@ class Tensor:
         String representation of the Tensor object.
         """
         return f"Tensor(data={self.data}, shape={self.shape}, requires_grad={self.auto_grad})"
+
+    def __matmul__(self, other):
+        """
+        Matrix multiplication operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = Tensor(self.data @ other.data, requires_grad=self.auto_grad or other.auto_grad)
+            result._prev.add(self)
+            result._prev.add(other)
+            result._op = "matmul"
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))
+
+    def __add__(self, other):
+        """
+        Addition operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = Tensor(self.data + other.data, requires_grad=self.auto_grad or other.auto_grad)
+            result._prev.add(self)
+            result._prev.add(other)
+            result._op = "add"
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for +: 'Tensor' and '{}'".format(type(other)))

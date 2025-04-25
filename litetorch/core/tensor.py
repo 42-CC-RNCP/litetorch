@@ -62,3 +62,16 @@ class Tensor:
             return result
         else:
             raise TypeError("Unsupported operand type(s) for +: 'Tensor' and '{}'".format(type(other)))
+
+    def __sub__(self, other):
+        """
+        Subtraction operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = Tensor(self.data - other.data, requires_grad=self.auto_grad or other.auto_grad)
+            result._prev.add(self)
+            result._prev.add(other)
+            result._op = "sub"
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for -: 'Tensor' and '{}'".format(type(other)))

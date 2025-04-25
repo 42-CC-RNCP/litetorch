@@ -1,5 +1,11 @@
 # litetorch
 
+This project is just for learning purpose and to practice designing a neural network framework from scratch. (and for fun)
+
+The goal is to understand the inner workings of a neural network framework and try to learn how to design the interfaces and the architecture with SOLID principles in mind.
+
+Oh and also will be used to do other 42 master branches projects.🐒
+
 ## How to Implement A NN Framework From Scratch
 
 I implemented a simple neural network framework from scratch using Python.

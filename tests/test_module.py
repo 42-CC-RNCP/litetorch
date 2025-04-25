@@ -77,6 +77,7 @@ def test_add_module():
     assert module._modules["submodule"]._name == "submodule", "Submodule name should be 'submodule'."
     assert module._modules["submodule"]._modules == {}, "Submodule submodules should be initialized as an empty dictionary."
 
+
 def test_zero_grad():
     module = DummyModule()
     # set the gradients to 1.0 for testing
@@ -85,6 +86,7 @@ def test_zero_grad():
     module.zero_grad()
     for param in module.parameters():
         assert param.grad.sum() == 0, "Gradients should be zero after zero_grad call."
+
 
 def test_add_module_and_forward():
     module = DummyModule()

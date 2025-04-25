@@ -30,7 +30,7 @@ class Module:
         self._modules[name] = module
         module._name = name
 
-    def forward(self, x) -> Tensor:
+    def forward(self, x: Tensor) -> Tensor:
         raise NotImplementedError("Forward method not implemented.")
 
     def backward(self, grad_output: Tensor) -> Tensor:

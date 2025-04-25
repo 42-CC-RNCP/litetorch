@@ -9,19 +9,19 @@ Date: 2025-04-25
 
 import numpy as np
 from litetorch.loss.base import Loss
+from litetorch.utils.function import softmax
 
 
 class BinaryCrossEntropyLoss(Loss):
-    def __init__(self) -> None:
+    def __init__(self, epsilon: float = 1e-15) -> None:
         super().__init__()
+        self.epsilon = epsilon
         self._name = "BinaryCrossEntropyLoss"
 
     def forward(self, output: np.ndarray, target: np.ndarray) -> float:
-        # Clip the output to prevent log(0)
-        output = np.clip(output, 1e-15, 1 - 1e-15)
-        return -np.mean(target * np.log(output) + (1 - target) * np.log(1 - output))
+        loss = -np.mean(target * np.log(output + self.epsilon) + (1 - target) * np.log(1 - output + 1e-15))
+        return loss
 
     def backward(self, output: np.ndarray, target: np.ndarray) -> np.ndarray:
-        # Clip the output to prevent division by zero
-        output = np.clip(output, 1e-15, 1 - 1e-15)
-        return (output - target) / (output * (1 - output) * output.size)
+        grad = (output - target) / (output * (1 - output) + self.epsilon)
+        return grad

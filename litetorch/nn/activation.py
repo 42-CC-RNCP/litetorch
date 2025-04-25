@@ -22,6 +22,12 @@ class ReLU(Module):
     def forward(self, input: Tensor) -> Tensor:
         return Tensor(relu(input.data), requires_grad=input.auto_grad)
 
+    def backward(self, grad_output: Tensor) -> Tensor:
+        # backward is not typically in the activation function
+        # but in the layer that uses it
+        # here we just do nothing
+        return grad_output
+
 
 class Sigmoid(Module):
     """
@@ -32,6 +38,12 @@ class Sigmoid(Module):
     def forward(self, input: Tensor) -> Tensor:
         return Tensor(sigmoid(input.data), requires_grad=input.auto_grad)
 
+    def backward(self, grad_output: Tensor) -> Tensor:
+        # backward is not typically in the activation function
+        # but in the layer that uses it
+        # here we just do nothing
+        return grad_output
+
 
 class Tanh(Module):
     """
@@ -41,6 +53,12 @@ class Tanh(Module):
     """
     def forward(self, input: Tensor) -> Tensor:
         return Tensor(tanh(input.data), requires_grad=input.auto_grad)
+
+    def backward(self, grad_output: Tensor) -> Tensor:
+        # backward is not typically in the activation function
+        # but in the layer that uses it
+        # here we just do nothing
+        return grad_output
 
 
 class Softmax(Module):
@@ -57,6 +75,12 @@ class Softmax(Module):
     def forward(self, input: Tensor) -> Tensor:
         return Tensor(softmax(input.data, axis=self.dim), requires_grad=input.auto_grad)
 
+    def backward(self, grad_output: Tensor) -> Tensor:
+        # backward is not typically in the activation function
+        # but in the layer that uses it
+        # here we just do nothing
+        return grad_output
+
 
 class LeakyReLU(Module):
     """
@@ -71,3 +95,9 @@ class LeakyReLU(Module):
 
     def forward(self, input: Tensor) -> Tensor:
         return Tensor(leaky_relu(input.data, self.negative_slope), requires_grad=input.auto_grad)
+
+    def backward(self, grad_output: Tensor) -> Tensor:
+        # backward is not typically in the activation function
+        # but in the layer that uses it
+        # here we just do nothing
+        return grad_output

@@ -10,6 +10,7 @@ Date: 2025-04-25
 import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.module import Module
+from litetorch.utils.function import *
 
 
 class ReLU(Module):
@@ -19,7 +20,7 @@ class ReLU(Module):
         f(x) = max(0, x)
     """
     def forward(self, input: Tensor) -> Tensor:
-        return Tensor(np.maximum(0, input.data), requires_grad=input.auto_grad)
+        return Tensor(relu(input.data), requires_grad=input.auto_grad)
 
 
 class Sigmoid(Module):
@@ -29,7 +30,7 @@ class Sigmoid(Module):
         f(x) = 1 / (1 + exp(-x))
     """
     def forward(self, input: Tensor) -> Tensor:
-        return Tensor(1 / (1 + np.exp(-input.data)), requires_grad=input.auto_grad)
+        return Tensor(sigmoid(input.data), requires_grad=input.auto_grad)
 
 
 class Tanh(Module):
@@ -39,7 +40,7 @@ class Tanh(Module):
         f(x) = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
     """
     def forward(self, input: Tensor) -> Tensor:
-        return Tensor(np.tanh(input.data), requires_grad=input.auto_grad)
+        return Tensor(tanh(input.data), requires_grad=input.auto_grad)
 
 
 class Softmax(Module):
@@ -54,8 +55,7 @@ class Softmax(Module):
         self.dim = dim
 
     def forward(self, input: Tensor) -> Tensor:
-        exp_input = np.exp(input.data - np.max(input.data, axis=self.dim, keepdims=True))
-        return Tensor(exp_input / np.sum(exp_input, axis=self.dim, keepdims=True), requires_grad=input.auto_grad)
+        return Tensor(softmax(input.data, axis=self.dim), requires_grad=input.auto_grad)
 
 
 class LeakyReLU(Module):
@@ -70,4 +70,4 @@ class LeakyReLU(Module):
         self.negative_slope = negative_slope
 
     def forward(self, input: Tensor) -> Tensor:
-        return Tensor(np.where(input.data > 0, input.data, self.negative_slope * input.data), requires_grad=input.auto_grad)
+        return Tensor(leaky_relu(input.data, self.negative_slope), requires_grad=input.auto_grad)

@@ -8,7 +8,7 @@ Date: 2025-04-26
 """
 
 import numpy as np
-from litetorch.data.split import train_val_split, train_val_test_split, kfold_split
+from litetorch.data.split import *
 
 
 def test_train_val_split():
@@ -47,3 +47,20 @@ def test_kfold_split():
         assert len(y_train) + len(y_valid) == 10
         assert y_valid.shape[0] == X_valid.shape[0]
         assert y_train.shape[0] == X_train.shape[0]
+
+
+def test_stratified_kfold_split():
+    X = np.arange(20).reshape(10, 2)
+    y = np.array([0, 1] * 5)
+
+    folds = list(stratified_kfold_split(X, y, n_splits=5, shuffle=False))
+
+    assert len(folds) == 5
+    for X_train, y_train, X_valid, y_valid in folds:
+        assert len(X_train) + len(X_valid) == 10
+        assert X_valid.shape[1] == 2
+        assert len(y_train) + len(y_valid) == 10
+        assert y_valid.shape[0] == X_valid.shape[0]
+        assert y_train.shape[0] == X_train.shape[0]
+        assert np.array_equal(np.unique(y_valid), np.array([0, 1]))
+        assert np.array_equal(np.unique(y_train), np.array([0, 1]))

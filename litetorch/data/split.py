@@ -130,3 +130,59 @@ def kfold_split(
         else:
             yield (X_train, X_val, None, None)
         current = stop
+
+
+def stratified_kfold_split(
+    X: np.ndarray,
+    y: np.ndarray,
+    n_splits: int = 5,
+    shuffle: bool = True,
+    random_state: int = None
+) -> Generator[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], None, None]:
+    """
+    Generate indices to split data into training and validation sets for Stratified K-Fold cross-validation.
+
+    Parameters:
+    - X: Features of the dataset.
+    - y: Labels of the dataset.
+    - n_splits: Number of folds.
+    - shuffle: Whether to shuffle the data before splitting.
+    - random_state: Seed for the random number generator.
+
+    Yields:
+    - A tuple containing the training and validation indices for each fold.
+    """
+    if random_state is not None:
+        np.random.seed(random_state)
+
+    n_samples = X.shape[0]
+    unique_classes = np.unique(y)
+
+    class_indices = {cls: np.where(y == cls)[0] for cls in unique_classes}
+
+    if shuffle:
+        for cls in class_indices:
+            np.random.shuffle(class_indices[cls])
+
+    # Saparately shuffle the indices of each class
+    folds = [[] for _ in range(n_splits)]
+    for cls in unique_classes:
+        indices = class_indices[cls]
+        fold_sizes = np.full(n_splits, len(indices) // n_splits, dtype=int)
+        fold_sizes[:len(indices) % n_splits] += 1
+
+        current = 0
+        for i, fold_size in enumerate(fold_sizes):
+            start, stop = current, current + fold_size
+            folds[i].extend(indices[start:stop])
+            current = stop
+
+    # generate the train/val splits
+    for fold_indices in folds:
+        val_indices = np.array(fold_indices)
+        train_indices = np.setdiff1d(np.arange(n_samples), val_indices)
+
+        X_train, X_val = X[train_indices], X[val_indices]
+        y_train, y_val = y[train_indices], y[val_indices]
+
+        yield (X_train, y_train, X_val, y_val)

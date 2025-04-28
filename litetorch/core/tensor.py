@@ -111,6 +111,13 @@ class Tensor:
         else:
             raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))
 
+    @property
+    def T(self) -> 'Tensor':
+        """
+        Transpose the Tensor (swap last two dimensions).
+        """
+        return Tensor(self.data.T, requires_grad=self.auto_grad)
+
     def __repr__(self):
         """
         String representation of the Tensor object.

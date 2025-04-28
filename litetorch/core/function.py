@@ -45,6 +45,8 @@ class Function(ABC):
         pass
 
     def __call__(self, *inputs: Tuple[Tensor]) -> Tensor:
+        from litetorch.core.tensor import Tensor
+
         self.inputs = inputs
         outputs = self.forward(*inputs)
 

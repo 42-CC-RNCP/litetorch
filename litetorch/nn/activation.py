@@ -37,8 +37,7 @@ class Softmax(Module):
         self.dim = dim
 
     def forward(self, input: Tensor) -> Tensor:
-        return SoftmaxFunction()(input, dim=self.dim)
-
+        return SoftmaxFunction(dim=self.dim)(input)
 
 class LeakyReLU(Module):
     def __init__(self, negative_slope: float = 0.01):
@@ -46,4 +45,4 @@ class LeakyReLU(Module):
         self.negative_slope = negative_slope
 
     def forward(self, input: Tensor) -> Tensor:
-        return LeakyReLUFunction()(input, negative_slope=self.negative_slope)
+        return LeakyReLUFunction(negative_slope=self.negative_slope)(input)

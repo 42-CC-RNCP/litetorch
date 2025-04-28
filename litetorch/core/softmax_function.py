@@ -20,11 +20,12 @@ class SoftmaxFunction(Function):
         f(x_i) = exp(x_i) / sum(exp(x_j))
     where the sum is over all j in the specified dimension.
     """
-
-    def forward(self, input: Tensor, dim: int = -1) -> Tensor:
-        self.input = input
+    def __init__(self, dim: int = -1):
         self.dim = dim
-        output = softmax(input.data, dim)
+
+    def forward(self, input: Tensor) -> Tensor:
+        self.input = input
+        output = softmax(input.data, self.dim)
         return Tensor(output, requires_grad=input.auto_grad)
 
     def backward(self, *grad_outputs: Tensor) -> Tuple[Tensor, ...]:

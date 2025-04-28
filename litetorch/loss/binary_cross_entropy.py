@@ -7,7 +7,6 @@ Version: 0.0.1
 Date: 2025-04-25
 """
 
-import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.loss.base import Loss
 from litetorch.core.binary_cross_entropy_function import BinaryCrossEntropyFunction

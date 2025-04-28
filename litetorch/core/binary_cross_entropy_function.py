@@ -23,6 +23,9 @@ class BinaryCrossEntropyFunction(Function):
         - y_hat: predicted probabilities
         - N: number of samples
     """
+    def __init__(self, epsilon: float = 1e-15) -> None:
+        super().__init__()
+        self.epsilon = epsilon
 
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         self.input = input

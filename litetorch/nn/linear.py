@@ -9,6 +9,8 @@ Date: 2025-04-24
 
 import numpy as np
 from litetorch.core.tensor import Tensor
+from litetorch.core.add_function import AddFunction
+from litetorch.core.matmul_function import MatMulFunction
 from litetorch.nn.module import Module
 
 
@@ -44,39 +46,18 @@ class Linear(Module):
         self._parameters["bias"] = self.bias_tensor if bias else None
         self._name = "Linear"
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, input: Tensor) -> Tensor:
         """
         Forward pass through the linear layer.
 
         Parameters:
-        - x: Input tensor of shape (batch_size, in_features).
+        - input: Input tensor of shape (batch_size, in_features).
 
         Returns:
         - Output tensor of shape (batch_size, out_features).
         """
-        self.input = x
-        if self.bias_tensor is not None:
-            return x @ self.weight + self.bias_tensor
-        else:
-            return x @ self.weight
-
-    def backward(self, grad_output: Tensor) -> Tensor:
-        x = self.input.data
-
-        # shape of grad_output should be (batch_size, out_features)
-        dL_dy = grad_output.data
-
-        # ∂L/∂W = x^T * ∂L/∂y
-        dL_dW = x.T @ dL_dy
-        self.weight.grad += dL_dW
-
-        # ∂L/∂b = ∂L/∂y
-        dL_db = np.sum(dL_dy, axis=0, keepdims=True) if self.bias else None
-        self.bias_tensor.grad += dL_db
-
-        # ∂L/∂x = ∂L/∂y * W^T
-        dL_dx = dL_dy @ self.weight.data.T
-        return Tensor(dL_dx, requires_grad=self.input.auto_grad)
-
-    def __repr__(self) -> str:
-        return f"Linear(in_features={self.in_features}, out_features={self.out_features}, bias={self.bias})"
+        self.input = input
+        output = MatMulFunction()(input, self.weight)
+        if self.bias:
+            output = AddFunction()(output, self.bias_tensor)
+        return output

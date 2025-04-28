@@ -9,8 +9,8 @@ Version: 0.0.1
 Date: 2025-04-25
 """
 
-import numpy as np
 from abc import ABC, abstractmethod
+from litetorch.core.tensor import Tensor
 
 
 class Loss(ABC):
@@ -22,44 +22,13 @@ class Loss(ABC):
         self._name = "Loss"
 
     @abstractmethod
-    def forward(self, output: np.ndarray, target: np.ndarray) -> float:
+    def forward(self, output: Tensor, target: Tensor) -> Tensor:
         """
-        Calculate the loss given the model's output and the target values.
-
-        Parameters:
-        - output: The model's output (predictions).
-        - target: The true target values.
-
-        Returns:
-        - The calculated loss value.
+        Compute the loss value as a Tensor, supporting autograd.
         """
         pass
 
-    @abstractmethod
-    def backward(self, output, target) -> float:
-        """
-        Calculate the gradient of the loss with respect to the model's output.
-
-        Parameters:
-        - output: The model's output (predictions).
-        - target: The true target values.
-
-        Returns:
-        - The gradient of the loss with respect to the model's output.
-        """
-        pass
-
-    def __call__(self, output: np.ndarray, target: np.ndarray) -> float:
-        """
-        Call the loss function to calculate the loss and its gradient.
-
-        Parameters:
-        - output: The model's output (predictions).
-        - target: The true target values.
-
-        Returns:
-        - The calculated loss value.
-        """
+    def __call__(self, output: Tensor, target: Tensor) -> Tensor:
         return self.forward(output, target)
 
     def __str__(self) -> str:

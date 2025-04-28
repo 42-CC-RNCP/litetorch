@@ -8,10 +8,11 @@ Version: 0.0.1
 Date: 2025-04-24
 """
 
-from typing import List, Dict, Any
+from abc import ABC, abstractmethod
+from typing import List, Dict
 from litetorch.core.tensor import Tensor
 
-class Module:
+class Module(ABC):
     def __init__(self):
         self._parameters: Dict[str, Tensor] = {}
         self._modules: Dict[str, 'Module'] = {}
@@ -30,11 +31,9 @@ class Module:
         self._modules[name] = module
         module._name = name
 
+    @abstractmethod
     def forward(self, x: Tensor) -> Tensor:
-        raise NotImplementedError("Forward method not implemented.")
-
-    def backward(self, grad_output: Tensor) -> Tensor:
-        raise NotImplementedError("Backward method not implemented.")
+        pass
 
     def parameters(self) -> List[Tensor]:
         params = list(self._parameters.values())

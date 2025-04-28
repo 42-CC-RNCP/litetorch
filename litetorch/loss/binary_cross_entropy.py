@@ -8,8 +8,9 @@ Date: 2025-04-25
 """
 
 import numpy as np
+from litetorch.core.tensor import Tensor
 from litetorch.loss.base import Loss
-from litetorch.utils.function import softmax
+from litetorch.core.binary_cross_entropy_function import BinaryCrossEntropyFunction
 
 
 class BinaryCrossEntropyLoss(Loss):
@@ -18,10 +19,5 @@ class BinaryCrossEntropyLoss(Loss):
         self.epsilon = epsilon
         self._name = "BinaryCrossEntropyLoss"
 
-    def forward(self, output: np.ndarray, target: np.ndarray) -> float:
-        loss = -np.mean(target * np.log(output + self.epsilon) + (1 - target) * np.log(1 - output + 1e-15))
-        return loss
-
-    def backward(self, output: np.ndarray, target: np.ndarray) -> np.ndarray:
-        grad = (output - target) / (output * (1 - output) + self.epsilon)
-        return grad
+    def forward(self, output: Tensor, target: Tensor) -> Tensor:
+        return BinaryCrossEntropyFunction(self.epsilon)(output, target)

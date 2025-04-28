@@ -64,7 +64,7 @@ def tanh(x: np.ndarray) -> np.ndarray:
     return np.tanh(x)
 
 
-def mse_loss(predictions: np.ndarray, targets: np.ndarray) -> float:
+def mse(predictions: np.ndarray, targets: np.ndarray) -> float:
     """
     Compute the Mean Squared Error (MSE) loss.
 

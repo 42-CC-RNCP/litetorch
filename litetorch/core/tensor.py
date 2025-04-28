@@ -10,6 +10,11 @@ Date: 2025-04-24
 
 import numpy as np
 from typing import List, Union
+from litetorch.core.add_function import AddFunction
+from litetorch.core.sub_function import SubFunction
+from litetorch.core.mul_function import MulFunction
+from litetorch.core.div_function import DivFunction
+from litetorch.core.matmul_function import MatMulFunction
 
 
 class Tensor:
@@ -27,9 +32,8 @@ class Tensor:
         self.shape = self.data.shape
         self.grad = np.zeros_like(self.data) if requires_grad else None
 
-        self._backward = lambda: None
-        self._prev = set()
-        self._op = ""
+        self.creator = None  # Function that created this tensor
+        self.creation_args = None  # Arguments used to create this tensor
 
     def __repr__(self):
         """
@@ -37,41 +41,53 @@ class Tensor:
         """
         return f"Tensor(data={self.data}, shape={self.shape}, requires_grad={self.auto_grad})"
 
-    def __matmul__(self, other):
-        """
-        Matrix multiplication operator overload.
-        """
-        if isinstance(other, Tensor):
-            result = Tensor(self.data @ other.data, requires_grad=self.auto_grad or other.auto_grad)
-            result._prev.add(self)
-            result._prev.add(other)
-            result._op = "matmul"
-            return result
-        else:
-            raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))
-
-    def __add__(self, other):
+    def __add__(self, other: 'Tensor'):
         """
         Addition operator overload.
         """
         if isinstance(other, Tensor):
-            result = Tensor(self.data + other.data, requires_grad=self.auto_grad or other.auto_grad)
-            result._prev.add(self)
-            result._prev.add(other)
-            result._op = "add"
+            result = AddFunction()(self, other)
             return result
         else:
             raise TypeError("Unsupported operand type(s) for +: 'Tensor' and '{}'".format(type(other)))
 
-    def __sub__(self, other):
+    def __sub__(self, other: 'Tensor'):
         """
         Subtraction operator overload.
         """
         if isinstance(other, Tensor):
-            result = Tensor(self.data - other.data, requires_grad=self.auto_grad or other.auto_grad)
-            result._prev.add(self)
-            result._prev.add(other)
-            result._op = "sub"
+            result = SubFunction()(self, other)
             return result
         else:
             raise TypeError("Unsupported operand type(s) for -: 'Tensor' and '{}'".format(type(other)))
+
+    def __mul__(self, other: 'Tensor'):
+        """
+        Multiplication operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = MulFunction()(self, other)
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))
+
+    def __div__(self, other: 'Tensor'):
+        """
+        Division operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = DivFunction()(self, other)
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for /: 'Tensor' and '{}'".format(type(other)))
+
+
+    def __matmul__(self, other: 'Tensor'):
+        """
+        Matrix multiplication operator overload.
+        """
+        if isinstance(other, Tensor):
+            result = MatMulFunction()(self, other)
+            return result
+        else:
+            raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))

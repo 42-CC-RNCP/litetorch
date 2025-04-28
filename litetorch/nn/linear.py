@@ -61,3 +61,6 @@ class Linear(Module):
         if self.bias:
             output = AddFunction()(output, self.bias_tensor)
         return output
+
+    def __repr__(self) -> str:
+        return f"Linear(in_features={self.in_features}, out_features={self.out_features}, bias={self.bias})"

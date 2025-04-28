@@ -44,7 +44,11 @@ class Tensor:
 
         if self.grad is None:
             self.grad = np.zeros_like(self.data)
-        self.grad += grad_output.data
+
+        grad = grad_output.data
+        if grad.shape != self.data.shape:
+            grad = grad.sum(axis=0, keepdims=True)
+        self.grad += grad
 
         if self.creator is not None:
             # Call the backward function of the creator

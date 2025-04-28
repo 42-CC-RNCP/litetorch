@@ -26,13 +26,11 @@ class MSEFunction(Function):
         """
         self.input = input
         self.target = target
-        self.diff = mse(input.data, target.data)
-        batch_size = input.data.size
-        return Tensor(self.diff / batch_size, requires_grad=input.auto_grad)
+        return Tensor(mse(input.data, target.data), requires_grad=input.auto_grad)
 
     def backward(self, *grad_outputs: Tensor) -> Tensor:
         grad_output = grad_outputs[0]
         batch_size = self.input.data.size
-        grad_input = (2 * self.diff) / batch_size
+        grad_input = (2 * (self.input.data - self.target.data)) / batch_size
         grad_input *= grad_output.data
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

@@ -48,7 +48,7 @@ class Function(ABC):
         from litetorch.core.tensor import Tensor
 
         self.inputs = inputs
-        outputs = self.forward(*inputs)
+        outputs : Tensor = self.forward(*inputs)
 
         if isinstance(outputs, Tensor):
             outputs.creator = self

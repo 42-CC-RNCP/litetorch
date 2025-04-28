@@ -29,6 +29,7 @@ class Tensor:
         self.grad = np.zeros_like(self.data) if requires_grad else None
 
         self.creator : Function = None  # The function that created this tensor
+        self.creation_args : List[Tensor] = []
         self.inputs : List[Tensor] = []  # Arguments used to create this tensor
 
     def backward(self, grad_output: 'Tensor' = None) -> None:
@@ -50,7 +51,7 @@ class Tensor:
             grads = self.creator.backward(Tensor(self.grad, requires_grad=False))
             if not isinstance(grads, tuple):
                 grads = (grads,)
-            for input_tensor, grad in zip(self.creator.inputs, grads):
+            for input_tensor, grad in zip(self.creation_args, grads):
                 if input_tensor.auto_grad:
                     input_tensor.backward(grad)
 

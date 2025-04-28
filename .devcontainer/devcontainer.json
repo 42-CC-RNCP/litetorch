@@ -1,11 +1,11 @@
 {
-    "name": "ai-project",
+    "name": "litetorch",
     "build": {
         "dockerfile": "Dockerfile"
     },
     "runArgs": [
         "--privileged",
-        "--name=ai_container"
+        "--name=litetorch"
     ],
     "customizations": {
         "vscode": {

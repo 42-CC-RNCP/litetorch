@@ -34,21 +34,13 @@ class Sequential(Module):
             x = layer(x)
         return x
 
-    def backward(self, grad_output: Tensor) -> Tensor:
-        """
-        Perform the backward pass through the network.
-        """
-        for layer in reversed(self.layers):
-            # update the gradient tensor and pass it to the previous layer
-            grad_output = layer.backward(grad_output)
-        return grad_output
-
     def parameters(self) -> List[Tensor]:
         """
         Get all parameters of the network.
         """
         params = []
         for layer in self.layers:
+            layer : Module
             params.extend(layer.parameters())
         return params
 

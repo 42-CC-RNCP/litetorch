@@ -12,6 +12,7 @@ from litetorch.core.tensor import Tensor
 from litetorch.nn.sequential import Sequential
 from litetorch.nn.linear import Linear
 from litetorch.nn.activation import ReLU
+from litetorch.loss.mse import MSELoss
 
 
 def test_sequential_representation():
@@ -43,11 +44,14 @@ def test_sequential_shape():
 
     assert output.shape == (4, 2), "Output shape mismatch after forward."
 
-     # --- Dummy loss ---
-    dummy_grad_output = Tensor(np.ones_like(output.data))
+    # --- Create target and loss ---
+    target = Tensor(np.zeros_like(output.data), requires_grad=False)
+    loss_fn = MSELoss()
+    loss = loss_fn(output, target)
 
     # --- Backward pass ---
-    grad_input = model.backward(dummy_grad_output)
+    loss.backward()
+    grad_input = x.grad
 
     # --- Check shape consistency ---
     assert grad_input.shape == (4, 10), "Grad input shape mismatch after backward."

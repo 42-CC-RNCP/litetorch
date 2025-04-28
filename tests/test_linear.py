@@ -10,6 +10,7 @@ Date: 2025-04-24
 import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.linear import Linear
+from litetorch.loss.mse import MSELoss
 
 
 def test_linear_init():
@@ -59,20 +60,26 @@ def test_linear_forward_no_bias_shape():
 
 def test_linear_backward_shape():
     """
-    Test backward pass of Linear layer.
+    Test backward pass of Linear layer shape.
     """
     linear = Linear(10, 5)
     x = Tensor([[1.0] * 10], requires_grad=True)
     output = linear(x)
-    grad_output = Tensor([[1.0] * 5], requires_grad=True)
-    linear.backward(grad_output)
+
+    # Create a target tensor same shape as output
+    target = Tensor(np.zeros_like(output.data), requires_grad=False)
+
+    # Use MSELoss
+    loss_fn = MSELoss()
+    loss = loss_fn(output, target)
+    loss.backward()
+
     assert linear.weight.grad is not None, "Weight gradient should not be None."
     assert linear.bias_tensor.grad is not None, "Bias gradient should not be None."
     assert linear.weight.grad.shape == (10, 5), "Weight gradient shape should be (10, 5)."
     assert linear.bias_tensor.grad.shape == (1, 5), "Bias gradient shape should be (1, 5)."
-    assert grad_output.shape == (1, 5), "Gradient output shape should be (1, 5)."
-    assert grad_output.auto_grad is True, "Gradient output should require gradients."
-    assert (grad_output.data == 1.0).all(), "Gradient output data should be all ones."
+    assert x.grad.shape == (1, 10), "Input x grad shape should be (1, 10)."
+
 
 def test_linear_forward_correctness():
     """
@@ -118,22 +125,25 @@ def test_linear_backward_correctness():
     W = np.ones((3, 2), dtype=np.float32)
     b = np.zeros((1, 2), dtype=np.float32)
     x_data = np.array([[1.0, 2.0, 3.0]], dtype=np.float32)
-    grad_out_data = np.array([[1.0, 1.0]], dtype=np.float32)
 
     x = Tensor(x_data, requires_grad=True)
-    grad_out = Tensor(grad_out_data)
 
     linear = Linear(3, 2)
     linear.weight.data[:] = W
     linear.bias_tensor.data[:] = b
 
-    linear.forward(x)
-    dx = linear.backward(grad_out)
+    output = linear(x)
+    target = Tensor(np.zeros((1, 2), dtype=np.float32), requires_grad=False)
 
-    expected_dW = x_data.T @ grad_out_data   # shape: (3,2)
-    expected_db = grad_out_data              # shape: (1,2)
-    expected_dx = grad_out_data @ W.T        # shape: (1,3)
+    loss_fn = MSELoss()
+    loss = loss_fn(output, target)  # --> forward MSE loss
+    loss.backward()                 # --> backward trigger autograd!
 
-    assert np.allclose(linear.weight.grad, expected_dW), "dW mismatch"
-    assert np.allclose(linear.bias_tensor.grad, expected_db), "db mismatch"
-    assert np.allclose(dx.data, expected_dx), "dx mismatch"
+    grad_output = (output.data - target.data) * (2 / output.data.size)  # MSELoss的 dL/dy
+    expected_dW = x_data.T @ grad_output
+    expected_db = grad_output
+    expected_dx = grad_output @ W.T
+
+    assert np.allclose(linear.weight.grad, expected_dW, atol=1e-6), "dW mismatch"
+    assert np.allclose(linear.bias_tensor.grad, expected_db, atol=1e-6), "db mismatch"
+    assert np.allclose(x.grad, expected_dx, atol=1e-6), "dx mismatch"

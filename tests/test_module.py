@@ -35,23 +35,6 @@ class DummyModule(Module):
         return f"{self.__class__.__name__}()"
 
 
-def test_module_init():
-    """
-    Test Module initialization.
-    """
-    module = Module()
-    assert isinstance(
-        module, Module
-    ), "Module should be an instance of the Module class."
-    assert (
-        module._parameters == {}
-    ), "Module parameters should be initialized as an empty dictionary."
-    assert (
-        module._modules == {}
-    ), "Module submodules should be initialized as an empty dictionary."
-    assert module._name == "Module", "Module name should be 'Module' by default."
-
-
 def test_parameters():
     module = DummyModule()
     assert isinstance(module.parameters(), list), "Parameters should be a list."

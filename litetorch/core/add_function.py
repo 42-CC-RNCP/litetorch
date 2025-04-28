@@ -8,8 +8,8 @@ Date: 2025-04-26
 """
 
 from typing import Tuple
-from litetorch.core.function import Function
 from litetorch.core.tensor import Tensor
+from litetorch.core.function import Function
 
 
 class AddFunction(Function):

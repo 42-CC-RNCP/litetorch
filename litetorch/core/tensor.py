@@ -10,11 +10,7 @@ Date: 2025-04-24
 
 import numpy as np
 from typing import List, Union
-from litetorch.core.add_function import AddFunction
-from litetorch.core.sub_function import SubFunction
-from litetorch.core.mul_function import MulFunction
-from litetorch.core.div_function import DivFunction
-from litetorch.core.matmul_function import MatMulFunction
+from litetorch.core.function import Function
 
 
 class Tensor:
@@ -32,8 +28,8 @@ class Tensor:
         self.shape = self.data.shape
         self.grad = np.zeros_like(self.data) if requires_grad else None
 
-        self.creator = None  # Function that created this tensor
-        self.creation_args = None  # Arguments used to create this tensor
+        self.creator : Function = None  # The function that created this tensor
+        self.inputs : List[Tensor] = []  # Arguments used to create this tensor
 
     def __repr__(self):
         """
@@ -46,6 +42,7 @@ class Tensor:
         Addition operator overload.
         """
         if isinstance(other, Tensor):
+            from litetorch.core.add_function import AddFunction
             result = AddFunction()(self, other)
             return result
         else:
@@ -56,6 +53,7 @@ class Tensor:
         Subtraction operator overload.
         """
         if isinstance(other, Tensor):
+            from litetorch.core.sub_function import SubFunction
             result = SubFunction()(self, other)
             return result
         else:
@@ -66,6 +64,7 @@ class Tensor:
         Multiplication operator overload.
         """
         if isinstance(other, Tensor):
+            from litetorch.core.mul_function import MulFunction
             result = MulFunction()(self, other)
             return result
         else:
@@ -76,6 +75,7 @@ class Tensor:
         Division operator overload.
         """
         if isinstance(other, Tensor):
+            from litetorch.core.div_function import DivFunction
             result = DivFunction()(self, other)
             return result
         else:
@@ -87,6 +87,7 @@ class Tensor:
         Matrix multiplication operator overload.
         """
         if isinstance(other, Tensor):
+            from litetorch.core.matmul_function import MatMulFunction
             result = MatMulFunction()(self, other)
             return result
         else:

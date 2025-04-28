@@ -7,9 +7,9 @@ Version: 0.0.1
 Date: 2025-04-26
 """
 
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Tuple
-from litetorch.core.tensor import Tensor
 
 
 class Function(ABC):
@@ -50,12 +50,12 @@ class Function(ABC):
 
         if isinstance(outputs, Tensor):
             outputs.creator = self
-            outputs.creation_args = inputs
+            outputs.creation_args = list(inputs)
         elif isinstance(outputs, (tuple, list)):
             for output in outputs:
                 if isinstance(output, Tensor):
                     output.creator = self
-                    output.creation_args = inputs
+                    output.creation_args = list(inputs)
         else:
             raise TypeError("Output must be a Tensor or a tuple/list of Tensors.")
         return outputs

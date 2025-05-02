@@ -62,5 +62,25 @@ class Linear(Module):
             output = AddFunction()(output, self.bias_tensor)
         return output
 
+    def get_config(self) -> dict:
+        return {
+            "type": "Linear",
+            "in_features": self.in_features,
+            "out_features": self.out_features,
+            "bias": self.bias,
+        }
+
+    def get_parameters(self) -> dict:
+        params = {"weight": self.weight.data.tolist()}
+        if self.bias:
+            params["bias"] = self.bias_tensor.data.tolist()
+        return params
+
+    def set_parameters(self, params: dict) -> None:
+        if "weight" in params:
+            self.weight.data = np.array(params["weight"])
+        if self.bias and "bias" in params:
+            self.bias_tensor.data = np.array(params["bias"])
+
     def __repr__(self) -> str:
         return f"Linear(in_features={self.in_features}, out_features={self.out_features}, bias={self.bias})"

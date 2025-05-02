@@ -31,6 +31,12 @@ class DummyModule(Module):
     def backward(self, grad_output):
         return grad_output
 
+    def get_config(self):
+        return {"type": "DummyModule"}
+
+    def get_parameters(self):
+        return {"weight": self.w.data, "bias": self.b.data}
+
     def __repr__(self):
         return f"{self.__class__.__name__}()"
 

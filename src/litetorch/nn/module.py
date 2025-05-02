@@ -12,11 +12,34 @@ from abc import ABC, abstractmethod
 from typing import List, Dict
 from litetorch.core.tensor import Tensor
 
+
 class Module(ABC):
     def __init__(self):
         self._parameters: Dict[str, Tensor] = {}
         self._modules: Dict[str, 'Module'] = {}
         self._name: str = self.__class__.__name__
+
+    @abstractmethod
+    def forward(self, x: Tensor) -> Tensor:
+        pass
+
+    @abstractmethod
+    def get_config(self) -> dict:
+        pass
+
+    def get_parameters(self) -> dict:
+        """
+        Returns a dictionary of parameters for the module.
+        Default implementation returns an empty dictionary.
+        """
+        return {}
+
+    def set_parameters(self, params: dict) -> None:
+        """
+        Sets the parameters for the module.
+        Default implementation does nothing.
+        """
+        pass
 
     def add_module(self, name: str, module: 'Module') -> None:
         """
@@ -30,10 +53,6 @@ class Module(ABC):
             raise TypeError(f"Expected a Module instance, got {type(module)}")
         self._modules[name] = module
         module._name = name
-
-    @abstractmethod
-    def forward(self, x: Tensor) -> Tensor:
-        pass
 
     def parameters(self) -> List[Tensor]:
         params = list(self._parameters.values())

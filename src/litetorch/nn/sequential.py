@@ -13,10 +13,10 @@ from typing import List, Callable, Any
 import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.module import Module
-from litetorch.optim.base import Optimizer
+from litetorch.utils.save_load import SaveLoadMixin
 
 
-class Sequential(Module):
+class Sequential(Module, SaveLoadMixin):
     """
     A sequential container for stacking layers in a neural network.
     """
@@ -42,6 +42,25 @@ class Sequential(Module):
         for layer in self.layers:
             layer : Module
             params.extend(layer.parameters())
+        return params
+
+    def get_config(self):
+        configs = []
+        for layer in self.layers:
+            layer : Module
+            configs.append({
+                "type": layer.__class__.__name__,
+                "config": layer.get_config()
+            })
+        return {"architecture": configs}
+
+    def get_parameters(self):
+        params = {}
+        for i, layer in enumerate(self.layers):
+            layer : Module
+            params = layer.get_parameters()
+            if params:
+                params[f"layer_{i}"] = params
         return params
 
     def __repr__(self):

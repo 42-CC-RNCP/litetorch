@@ -20,15 +20,24 @@ class ReLU(Module):
     def forward(self, input: Tensor) -> Tensor:
         return ReLUFunction()(input)
 
+    def get_config(self) -> dict:
+        return {"type": "ReLU"}
+
 
 class Sigmoid(Module):
     def forward(self, input: Tensor) -> Tensor:
         return SigmoidFunction()(input)
 
+    def get_config(self) -> dict:
+        return {"type": "Sigmoid"}
+
 
 class Tanh(Module):
     def forward(self, input: Tensor) -> Tensor:
         return TanhFunction()(input)
+
+    def get_config(self) -> dict:
+        return {"type": "Tanh"}
 
 
 class Softmax(Module):
@@ -39,6 +48,10 @@ class Softmax(Module):
     def forward(self, input: Tensor) -> Tensor:
         return SoftmaxFunction(dim=self.dim)(input)
 
+    def get_config(self) -> dict:
+        return {"type": "Softmax", "dim": self.dim}
+
+
 class LeakyReLU(Module):
     def __init__(self, negative_slope: float = 0.01):
         super().__init__()
@@ -46,3 +59,6 @@ class LeakyReLU(Module):
 
     def forward(self, input: Tensor) -> Tensor:
         return LeakyReLUFunction(negative_slope=self.negative_slope)(input)
+
+    def get_config(self) -> dict:
+        return {"type": "LeakyReLU", "negative_slope": self.negative_slope}

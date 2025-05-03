@@ -11,9 +11,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from litetorch.core.tensor import Tensor
-from litetorch.loss.mse import MSELoss
-from litetorch.loss.cross_entropy import CrossEntropyLoss
-from litetorch.loss.binary_cross_entropy import BinaryCrossEntropyLoss
+from litetorch.nn.loss import MSELoss, CrossEntropyLoss, BinaryCrossEntropyLoss
 
 
 def test_mse_loss():

@@ -8,7 +8,7 @@ Date: 2025-04-25
 """
 
 from litetorch.core.tensor import Tensor
-from litetorch.loss.base import Loss
+from litetorch.nn.loss import Loss
 from litetorch.core.binary_cross_entropy_function import BinaryCrossEntropyFunction
 
 

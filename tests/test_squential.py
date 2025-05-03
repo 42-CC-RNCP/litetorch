@@ -12,7 +12,7 @@ from litetorch.core.tensor import Tensor
 from litetorch.nn.sequential import Sequential
 from litetorch.nn.linear import Linear
 from litetorch.nn.activation import ReLU
-from litetorch.loss.mse import MSELoss
+from litetorch.nn.loss import MSELoss
 
 
 def test_sequential_representation():

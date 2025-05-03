@@ -10,7 +10,7 @@ Date: 2025-04-24
 import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.linear import Linear
-from litetorch.loss.mse import MSELoss
+from litetorch.nn.loss import MSELoss
 
 
 def test_linear_init():

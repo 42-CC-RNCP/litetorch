@@ -69,6 +69,12 @@ class Trainer:
                         print(f"Early stopping at epoch {epoch}")
                         break
     
+    def save_model(self, path: str = "saved_model.json") -> None:
+        if hasattr(self.model, "save"):
+            self.model.save(path)
+        else:
+            raise TypeError("Model does not support saving. Make sure it inherits from SaveLoadMixin.")
+    
     def _train_one_epoch(self) -> float:
         epoch_loss = 0.0
         for X_batch, y_batch in self.train_loader:

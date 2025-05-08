@@ -29,7 +29,7 @@ from typing import List, Dict
 
 
 class SaveLoadMixin:
-    def save(self, filepath: str) -> None:
+    def save(self, filepath: str, with_params = True) -> None:
         arch = []
         params = {}
 
@@ -39,8 +39,10 @@ class SaveLoadMixin:
 
         model_dict = {
             "architecture": arch,
-            "parameters": params
+            "parameters": {}
         }
+        if with_params:
+            model_dict["parameters"] = params
         with open(filepath, 'w') as f:
             json.dump(model_dict, f, indent=4)
         print(f"Model saved to {filepath}")

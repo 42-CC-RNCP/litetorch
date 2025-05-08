@@ -38,13 +38,13 @@ class Trainer:
         self.clip_grad = clip_grad
         # TODO: Implement callback functionality
         self.callbacks = callbacks if callbacks is not None else []
-        
+
         self.epoch = 0
         self.train_losses = []
         self.val_losses = []
         self.best_val_loss = float('inf')
         self.no_improv_epochs = 0
-        
+
     def train(self):
         for epoch in range(self.max_epochs):
             self.epoch = epoch
@@ -68,20 +68,21 @@ class Trainer:
                     if self.early_stopping and self.no_improv_epochs >= self.early_stopping:
                         print(f"Early stopping at epoch {epoch}")
                         break
-    
+
+
     def save_model(self, path: str = "saved_model.json") -> None:
         if hasattr(self.model, "save"):
             self.model.save(path)
         else:
             raise TypeError("Model does not support saving. Make sure it inherits from SaveLoadMixin.")
-    
+
     def _train_one_epoch(self) -> float:
         epoch_loss = 0.0
         for X_batch, y_batch in self.train_loader:
             # Forward pass
             y_pred = self.model(X_batch)
             loss = self.loss_fn(y_pred, y_batch)
-            
+
             # Backward pass
             self.optimizer.zero_grad()
             loss.backward()
@@ -92,7 +93,7 @@ class Trainer:
             epoch_loss += loss.data.item()
         # average training loss = total_loss / number of batches
         return epoch_loss / len(self.train_loader)
-    
+
     def _validate_one_epoch(self) -> float:
         total_loss = 0.0
         for X_batch, y_batch in self.val_loader:
@@ -103,3 +104,9 @@ class Trainer:
         # average validation loss = total_loss / number of batches
         average_val_loss = total_loss / len(self.val_loader)
         return average_val_loss
+
+    def __str__(self):
+        return f"batch_{self.train_loader.batch_size}_epochs_{self.max_epochs}_lr_{self.optimizer.lr}_loss_{self.loss_fn.__class__.__name__}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(model={self.model}, optimizer={self.optimizer}, loss_fn={self.loss_fn}, train_loader={self.train_loader}, max_epochs={self.max_epochs})"

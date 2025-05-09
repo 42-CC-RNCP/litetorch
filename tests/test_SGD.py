@@ -27,8 +27,8 @@ def test_basic_sgd():
     optimizer.step()
 
     # Check if the parameter is updated correctly
-    expected_param = [[1.0 - 0.01 * 0.1, 2.0 - 0.01 * 0.2]]
-    assert (param.data == expected_param).all(), "SGD step did not update the parameter correctly."
+    expected_param = np.array([[0.999, 1.998]], dtype=np.float32)
+    assert np.allclose(param.data, expected_param), "SGD step did not update the parameter correctly."
 
 
 def test_sgd_with_momentum():
@@ -156,8 +156,12 @@ def test_sgd_with_all_params():
     expected_param1 = [[1.0 - 0.01 * 0.1, 2.0 - 0.01 * 0.2]]
     expected_param2 = [[3.0 - 0.01 * 0.3, 4.0 - 0.01 * 0.4]]
 
-    assert (param1.data == expected_param1).all(), "SGD step did not update param1 correctly."
-    assert (param2.data == expected_param2).all(), "SGD step did not update param2 correctly."
+    assert np.allclose(param1.data, expected_param1), (
+        f"SGD step did not update param1 correctly.\nExpected: {expected_param1}, Got: {param1.data}"
+    )
+    assert np.allclose(param2.data, expected_param2), (
+        f"SGD step did not update param2 correctly.\nExpected: {expected_param2}, Got: {param2.data}"
+    )
 
 
 def test_sgd_zero_grad():

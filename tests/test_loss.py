@@ -12,6 +12,7 @@ import torch
 import torch.nn.functional as F
 from litetorch.core.tensor import Tensor
 from litetorch.nn.loss import MSELoss, CrossEntropyLoss, BinaryCrossEntropyLoss
+from conftest import assert_no_nan_or_inf
 
 
 def test_mse_loss():
@@ -116,3 +117,24 @@ def test_binary_cross_entropy_loss():
     expected_grad = (output.data - target.data) / (output.data * (1 - output.data) * output.shape[0])
 
     assert np.allclose(grad, expected_grad), f"Binary Cross Entropy Loss gradient mismatch: {grad} != {expected_grad}"
+
+
+def test_binary_cross_entropy_loss_edge_cases():
+    """
+    Test Binary Cross Entropy loss function with extreme predictions near 0 and 1.
+    """
+
+    bce_loss = BinaryCrossEntropyLoss()
+    output_np = np.array([[0.0], [1.0], [1e-20], [1 - 1e-20]])
+    target_np = np.array([[0], [1], [0], [1]])
+    output = Tensor(output_np, requires_grad=True)
+    target = Tensor(target_np, requires_grad=False)
+
+    # Forward pass should not produce NaN or Inf
+    loss_value = bce_loss.forward(output, target)
+    assert_no_nan_or_inf(loss_value.data, "Loss")
+
+    # Backward pass should also not produce NaN or Inf
+    loss_value.backward()
+    grad = output.grad
+    assert_no_nan_or_inf(output.grad, "Grad")

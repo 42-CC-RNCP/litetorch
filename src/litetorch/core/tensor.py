@@ -24,7 +24,7 @@ class Tensor:
         """
 
         self.auto_grad = requires_grad
-        self.data = np.array(data) if isinstance(data, list) else data
+        self.data = np.asarray(data, dtype=np.float32)
         self.shape = self.data.shape
         self.grad = np.zeros_like(self.data) if requires_grad else None
 

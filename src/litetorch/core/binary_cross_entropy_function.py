@@ -32,10 +32,13 @@ class BinaryCrossEntropyFunction(Function):
         self.target = target
 
         # Clip input to avoid log(0)
-        self.input.data = np.clip(self.input.data, 1e-15, 1 - 1e-15)
+        input_data = np.clip(self.input.data, self.epsilon, 1 - self.epsilon)
 
         # Calculate the Binary Cross Entropy loss
-        loss = -np.mean(target.data * np.log(self.input.data) + (1 - target.data) * np.log(1 - self.input.data))
+        loss = -np.mean(
+            target.data * np.log(input_data + self.epsilon) +
+            (1 - target.data) * np.log(1 - input_data + self.epsilon)
+        )
 
         return Tensor(loss, requires_grad=input.auto_grad)
 

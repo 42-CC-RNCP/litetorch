@@ -1,3 +1,10 @@
+[Recorded by: 2025-05-08]
+
+# TODO List
+- [ ] Implement the `Adam` optimizer
+- [ ] ~~Implement the `LabelEncoder` and `OneHotEncoder` for the data loader~~
+    - by the desgin mindset, the nn framework should not be responsible for the data preprocessing
+
 [Recorded by: 2025-05-04]
 
 # TODO List

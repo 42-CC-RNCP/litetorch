@@ -44,7 +44,11 @@ class BinaryCrossEntropyFunction(Function):
         batch_size = self.input.data.shape[0]
 
         # Calculate the gradient of the Binary Cross Entropy loss
-        grad_input = (self.input.data - self.target.data) / (self.input.data * (1 - self.input.data) * batch_size)
+        # grad_input = (self.input.data - self.target.data) / (self.input.data * (1 - self.input.data) * batch_size)
+        # Need to make sure the denominator is not zero
+        denominator = self.input.data * (1 - self.input.data) * batch_size
+        denominator = np.clip(denominator, self.epsilon, np.inf)
+        grad_input = (self.input.data - self.target.data) / denominator
         grad_input *= grad_output.data
 
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

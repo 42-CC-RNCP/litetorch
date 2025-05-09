@@ -15,7 +15,7 @@ def train_val_split(
     data: np.ndarray,
     val_size: float = 0.2,
     shuffle: bool = True,
-    random_state: int = None
+    random_state: int = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Split the dataset into training and validation sets.
@@ -42,12 +42,30 @@ def train_val_split(
     return train_data, val_data
 
 
+def train_test_split(
+    data: np.ndarray,
+    test_size: float = 0.2,
+    shuffle: bool = True,
+    random_state: int = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    if random_state is not None:
+        np.random.seed(random_state)
+
+    if shuffle:
+        np.random.shuffle(data)
+
+    split_index = int(len(data) * (1 - test_size))
+    train_data = data[:split_index]
+    test_data = data[split_index:]
+    return train_data, test_data
+
+
 def train_val_test_split(
     data: np.ndarray,
     val_size: float = 0.2,
     test_size: float = 0.2,
     shuffle: bool = True,
-    random_state: int = None
+    random_state: int = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Split the dataset into training, validation, and test sets.
@@ -88,7 +106,7 @@ def kfold_split(
     y: np.ndarray = None,
     n_splits: int = 5,
     shuffle: bool = True,
-    random_state: int = None
+    random_state: int = None,
 ) -> Generator[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], None, None]:
     """
     Generate indices to split data into training and validation sets for K-Fold cross-validation.
@@ -114,7 +132,7 @@ def kfold_split(
 
     fold_sizes = np.full(n_splits, n_samples // n_splits, dtype=int)
     # balance the last fold if n_samples is not divisible by n_splits
-    fold_sizes[:n_samples % n_splits] += 1
+    fold_sizes[: n_samples % n_splits] += 1
 
     current = 0
     for fold_size in fold_sizes:
@@ -137,7 +155,7 @@ def stratified_kfold_split(
     y: np.ndarray,
     n_splits: int = 5,
     shuffle: bool = True,
-    random_state: int = None
+    random_state: int = None,
 ) -> Generator[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], None, None]:
     """
     Generate indices to split data into training and validation sets for Stratified K-Fold cross-validation.
@@ -169,7 +187,7 @@ def stratified_kfold_split(
     for cls in unique_classes:
         indices = class_indices[cls]
         fold_sizes = np.full(n_splits, len(indices) // n_splits, dtype=int)
-        fold_sizes[:len(indices) % n_splits] += 1
+        fold_sizes[: len(indices) % n_splits] += 1
 
         current = 0
         for i, fold_size in enumerate(fold_sizes):

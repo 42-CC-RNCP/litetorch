@@ -11,6 +11,17 @@ import numpy as np
 from litetorch.data.split import *
 
 
+def test_train_test_split():
+    """
+    Test the train_test_split function.
+    """
+    data = np.arange(10)
+    train_data, test_data = train_test_split(data, test_size=0.2, shuffle=False)
+
+    assert len(train_data) == 8, "Training data size mismatch."
+    assert len(test_data) == 2, "Test data size mismatch."
+
+
 def test_train_val_split():
     """
     Test the train_val_split function.

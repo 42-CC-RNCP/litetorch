@@ -36,6 +36,12 @@ class DataLoader:
         elif self.auto_batch:
             self.batch_size = min(self.batch_size, self.n_samples)
 
+    def __len__(self) -> int:
+        if self.auto_batch:
+            return (self.n_samples + self.batch_size - 1) // self.batch_size
+        else:
+            return self.n_samples
+
     def __iter__(self) -> Generator[tuple[Tensor, Tensor], None, None]:
         indices = list(range(self.n_samples))
         if self.shuffle:

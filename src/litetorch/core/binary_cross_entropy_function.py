@@ -11,6 +11,7 @@ import numpy as np
 from litetorch.core.function import Function
 from litetorch.core.tensor import Tensor
 from litetorch.utils.function import softmax
+from litetorch.utils.linear_algebra import reduce_broadcast_shape
 
 
 class BinaryCrossEntropyFunction(Function):
@@ -31,9 +32,9 @@ class BinaryCrossEntropyFunction(Function):
         self.input = input
         self.target = target
 
-        if target.shape != input.shape:
+        if self.target.shape != input.shape:
             try:
-                target = Tensor(np.broadcast_to(target.data.reshape(input.shape), input.shape))
+                self.target = Tensor(self.target.data.reshape(input.shape))
             except Exception:
                 raise ValueError(f"[BinaryCrossEntropy] Shape mismatch: input.shape = {input.shape}, target.shape = {target.shape}")
 
@@ -42,8 +43,8 @@ class BinaryCrossEntropyFunction(Function):
 
         # Calculate the Binary Cross Entropy loss
         loss = -np.mean(
-            target.data * np.log(input_data + self.epsilon) +
-            (1 - target.data) * np.log(1 - input_data + self.epsilon)
+            self.target.data * np.log(input_data + self.epsilon) +
+            (1 - self.target.data) * np.log(1 - input_data + self.epsilon)
         )
 
         return Tensor(loss, requires_grad=input.auto_grad)
@@ -59,5 +60,8 @@ class BinaryCrossEntropyFunction(Function):
         denominator = np.clip(denominator, self.epsilon, np.inf)
         grad_input = (self.input.data - self.target.data) / denominator
         grad_input *= grad_output.data
+
+        if grad_input.shape != self.input.shape:
+            grad_input = reduce_broadcast_shape(grad_input, self.input.shape)
 
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

@@ -38,61 +38,48 @@ def test_mse_loss():
 
 
 def test_cross_entropy_loss():
-    """
-    Test Cross Entropy loss function.
-    """
     output = Tensor(np.array([[2.0, 1.0, 0.1]], dtype=np.float32), requires_grad=True)
-    target = Tensor(np.array([[1.0, 0.0, 0.0]], dtype=np.float32), requires_grad=True)
+    target = Tensor(np.array([0]), requires_grad=False)  # class index
 
-    # Forward pass
     cross_entropy_loss = CrossEntropyLoss()
-    loss_value = cross_entropy_loss.forward(output, target)
-    # Apply softmax to the output to get probabilities
-    probabilities = np.exp(output.data - np.max(output.data, axis=1, keepdims=True))
-    probabilities /= np.sum(probabilities, axis=1, keepdims=True)
-    # Clip probabilities to avoid log(0)
-    probabilities = np.clip(probabilities, 1e-15, 1 - 1e-15)
-    # Calculate the Cross Entropy loss
-    expected_loss = -np.sum(target.data * np.log(probabilities)) / target.data.shape[0]
-    assert np.isclose(loss_value.data, expected_loss), f"Cross Entropy Loss value mismatch: {loss_value} != {expected_loss}"
+    loss_value = cross_entropy_loss(output, target)
 
-    # Backward pass
+    # 手動計算 softmax + NLL
+    logits = output.data
+    exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
+    probs = exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
+    expected_loss = -np.log(probs[0, 0])  # class index 0
+
+    assert np.isclose(loss_value.data, expected_loss, atol=1e-6)
+
     loss_value.backward()
-    grad = output.grad
-    expected_grad = (probabilities - target.data) / target.data.shape[0]
-
-    assert np.allclose(grad, expected_grad), f"Cross Entropy Loss gradient mismatch: {grad} != {expected_grad}"
+    expected_grad = probs.copy()
+    expected_grad[0, 0] -= 1  # subtract 1 for correct class
+    assert np.allclose(output.grad, expected_grad, atol=1e-6)
 
 
 def test_cross_entropy_loss_with_pytorch():
-    """
-    Test Cross Entropy loss function.
-    """
     output_np = np.array([[2.0, 1.0, 0.1]], dtype=np.float32)
-    target_np = np.array([[1.0, 0.0, 0.0]], dtype=np.float32)
+    target_np = np.array([0])  # class index
     output = Tensor(output_np, requires_grad=True)
-    target = Tensor(target_np, requires_grad=True)
+    target = Tensor(target_np)
 
-    # ----- litetorch -----
     cross_entropy_loss = CrossEntropyLoss()
-    loss_lite = cross_entropy_loss.forward(output, target)
+    loss_lite = cross_entropy_loss(output, target)
     loss_lite.backward()
     grad_lite = output.grad
 
-    # ----- PyTorch -----
+    # PyTorch
     output_torch = torch.tensor(output_np, requires_grad=True)
     target_torch = torch.tensor(target_np)
     loss_torch = F.cross_entropy(output_torch, target_torch)
     loss_torch.backward()
-    grad_torch = output_torch.grad
-    grad_torch = grad_torch.detach().numpy()
-    loss_torch = loss_torch.detach().numpy()
+    grad_torch = output_torch.grad.detach().numpy()
+    loss_torch_val = loss_torch.item()
 
-    # Check loss values
-    assert np.isclose(loss_lite.data, loss_torch), f"Cross Entropy Loss value mismatch: {loss_lite} != {loss_torch}"
-    # Check gradients
-    assert np.allclose(grad_lite, grad_torch), f"Cross Entropy Loss gradient mismatch: {grad_lite} != {grad_torch}"
-
+    assert np.isclose(loss_lite.data, loss_torch_val, atol=1e-6)
+    assert np.allclose(grad_lite, grad_torch, atol=1e-6)
+    
 
 def test_binary_cross_entropy_loss():
     """

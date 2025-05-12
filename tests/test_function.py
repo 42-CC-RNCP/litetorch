@@ -143,3 +143,25 @@ def test_bce_shape_handling():
     loss_flat.backward()
     assert input.grad.shape == input.shape, "Gradient shape mismatch after BCE backward"
 
+
+def test_ce_shape_handling():
+    from litetorch.core.cross_entropy_function import CrossEntropyFunction
+
+    # Simulate a batch of 3 samples with 5 classes
+    logits = Tensor(np.array([
+        [1.0, 2.0, 3.0, 4.0, 5.0],
+        [2.0, 2.0, 2.0, 2.0, 2.0],
+        [5.0, 4.0, 3.0, 2.0, 1.0],
+    ], dtype=np.float32), requires_grad=True)  # (3, 5)
+
+    target_indices = Tensor(np.array([4, 0, 2], dtype=np.int32))
+
+    ce = CrossEntropyFunction()
+    loss = ce(logits, target_indices)
+
+    assert isinstance(loss, Tensor), "CrossEntropy did not return a Tensor"
+    assert loss.data.shape == (), "Loss should be scalar"
+    assert loss.data > 0, "Loss value should be positive"
+
+    loss.backward()
+    assert logits.grad.shape == logits.shape, "Grad shape should match logits shape"

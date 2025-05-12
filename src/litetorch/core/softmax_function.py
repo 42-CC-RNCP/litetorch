@@ -25,10 +25,13 @@ class SoftmaxFunction(Function):
 
     def forward(self, input: Tensor) -> Tensor:
         self.input = input
-        output = softmax(input.data, self.dim)
-        return Tensor(output, requires_grad=input.auto_grad)
+        self.output_data = softmax(input.data, self.dim)
+        return Tensor(self.output_data, requires_grad=input.auto_grad)
 
     def backward(self, *grad_outputs: Tensor) -> Tuple[Tensor, ...]:
-        grad_output = grad_outputs[0]
-        grad_input = grad_output.data * (self.input.data * (1 - self.input.data)).sum(axis=self.dim, keepdims=True)
+        grad_output = grad_outputs[0].data
+        s = self.output_data
+        # grad_input = grad_output - sum(grad_output * s) * s
+        dot = (grad_output * s).sum(axis=self.dim, keepdims=True)
+        grad_input = s * (grad_output - dot)
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

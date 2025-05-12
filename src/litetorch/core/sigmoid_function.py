@@ -24,11 +24,10 @@ class SigmoidFunction(Function):
 
     def forward(self, input: Tensor) -> Tensor:
         self.input = input
-        output = sigmoid(input.data)
-        return Tensor(output, requires_grad=input.auto_grad)
+        self.output_data = sigmoid(input.data)
+        return Tensor(self.output_data, requires_grad=input.auto_grad)
 
     def backward(self, *grad_outputs: Tensor) -> Tuple[Tensor, ...]:
         grad_output = grad_outputs[0]
-        sigmoid_input = self.input.data
-        grad_input = grad_output.data * sigmoid_input * (1 - sigmoid_input)
+        grad_input = grad_output.data * self.output_data * (1 - self.output_data)
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

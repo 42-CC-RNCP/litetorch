@@ -52,9 +52,10 @@ class Trainer:
             train_loss = self._train_one_epoch()
             self.train_losses.append(train_loss)
             val_loss = self._validate_one_epoch() if self.val_loader else None
-            print(f"Epoch {epoch}/{self.max_epochs} - Train Loss: {train_loss:.4f}")
+            print(f"Epoch {epoch + 1}/{self.max_epochs}:")
+            print(f"\t- Train Loss: {train_loss:.4f}")
             if val_loss is not None:
-                print(f"Epoch {epoch}/{self.max_epochs} - Val Loss: {val_loss:.4f}")
+                print(f"\t- Val Loss: {val_loss:.4f}")
             else:
                 print()
             if self.val_loader:

@@ -8,6 +8,7 @@ Date: 2025-04-26
 """
 
 import numpy as np
+from typing import Tuple
 from litetorch.core.function import Function
 from litetorch.core.tensor import Tensor
 from litetorch.utils.function import softmax
@@ -16,40 +17,38 @@ from litetorch.utils.function import softmax
 class CrossEntropyFunction(Function):
     def forward(self, input: Tensor, target: Tensor) -> Tensor:
         """
-        Calculate the Cross Entropy loss between the input and target tensors.
+        CrossEntropy with class index targets.
 
-        Parameters:
-        - input: The predicted values (output of the model).
-        - target: The true values (ground truth).
-
-        Returns:
-        - A tensor containing the Cross Entropy loss value.
+        - input: shape (N, C), raw logits
+        - target: shape (N,), values in 0..C-1
         """
         self.input = input
         self.target = target
 
-        if target.shape != input.shape:
-            try:
-                target.data = np.broadcast_to(target.data, input.shape)
-            except ValueError:
-                raise ValueError(f"[BinaryCrossEntropy] Shape mismatch: input.shape = {input.shape}, target.shape = {target.shape}")
+        # Stable softmax
+        x = input.data
+        x = x - np.max(x, axis=1, keepdims=True)
+        exp_x = np.exp(x)
+        self.probabilities = exp_x / np.sum(exp_x, axis=1, keepdims=True)
 
-        self.probabilities = softmax(input.data)
+        # Log probability of the correct class
+        batch_indices = np.arange(x.shape[0])
+        target_indices = target.data.astype(np.int32)
+        log_probs = -np.log(self.probabilities[batch_indices, target_indices])
 
-        # Clip probabilities to avoid log(0)
-        self.probabilities = np.clip(self.probabilities, 1e-15, 1 - 1e-15)
-
-        # Calculate the Cross Entropy loss
-        loss = -np.sum(target.data * np.log(self.probabilities)) / target.shape[0]
-
+        loss = np.mean(log_probs)
         return Tensor(loss, requires_grad=input.auto_grad)
 
-    def backward(self, *grad_outputs: Tensor) -> Tensor:
-        grad_output = grad_outputs[0]
-        batch_size = self.input.data.shape[0]
+    def backward(self, *grad_outputs: Tuple[Tensor]) -> Tensor:
+        grad_output = grad_outputs[0].data  # usually scalar 1
 
-        # Calculate the gradient of the Cross Entropy loss
-        grad_input = (self.probabilities - self.target.data) / batch_size
-        grad_input *= grad_output.data
+        grad_input = self.probabilities.copy()
+        batch_indices = np.arange(self.input.data.shape[0])
+        class_indices = self.target.data.astype(np.int32)
 
+        # Subtract 1 from the correct class
+        grad_input[batch_indices, class_indices] -= 1
+        grad_input /= self.input.data.shape[0]  # average over batch
+
+        grad_input *= grad_output  # in case ∂L/∂loss ≠ 1
         return Tensor(grad_input, requires_grad=self.input.auto_grad)

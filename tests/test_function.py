@@ -52,6 +52,7 @@ def test_mul_backward_broadcast():
     assert np.allclose(a.grad, expected_grad_a)
     assert np.allclose(b.grad, expected_grad_b)
 
+
 def test_div_backward_broadcast():
     a = Tensor(np.array([[1.0, 2.0], [3.0, 4.0]]), requires_grad=True)
     b = Tensor(np.array([[2.0, 3.0]]), requires_grad=True)  # (1,2)
@@ -64,3 +65,60 @@ def test_div_backward_broadcast():
 
     assert np.allclose(a.grad, expected_grad_a, atol=1e-6)
     assert np.allclose(b.grad, expected_grad_b, atol=1e-6)
+
+
+def test_sub_backward_broadcast():
+    a = Tensor(np.array([[1.0, 2.0], [3.0, 4.0]]), requires_grad=True)
+    b = Tensor(np.array([[2.0, 3.0]]), requires_grad=True)  # (1,2)
+
+    out = a - b
+    out.backward(Tensor(np.ones_like(out.data)))  # ∂L/∂out = 1
+
+    expected_grad_a = np.ones_like(a.data)               # shape (2,2)
+    expected_grad_b = np.array([[-2.0, -2.0]])            # shape (1,2), sum of two -1s per column
+
+    assert np.allclose(a.grad, expected_grad_a)
+    assert np.allclose(b.grad, expected_grad_b)
+
+
+def test_softmax():
+    from litetorch.core.softmax_function import SoftmaxFunction
+
+    a = Tensor(np.array([[1.0, 2.0]]), requires_grad=True)
+    softmax = SoftmaxFunction(dim=1)
+    out = softmax(a)
+
+    exp = np.exp(np.array([[1.0, 2.0]]))
+    expected = exp / np.sum(exp, axis=1, keepdims=True)
+    assert np.allclose(out.data, expected, atol=1e-6), "Softmax forward failed"
+
+    grad_from_loss = Tensor(np.array([[1.0, 0.0]]))  # ∂L/∂softmax = [1, 0]
+    out.backward(grad_from_loss)
+
+    s = expected[0]
+    # Jv = s * (v - dot(v, s))
+    v = np.array([1.0, 0.0])
+    dot = np.dot(s, v)  # = s[0]
+    grad_expected = s * (v - dot)
+
+    assert np.allclose(a.grad, grad_expected.reshape(1, -1), atol=1e-6), f"Softmax backward incorrect.\nExpected: {grad_expected}\nGot: {a.grad}"
+
+def test_tahn():
+    from litetorch.core.tanh_function import TanhFunction
+
+    a = Tensor(np.array([[1.0, 2.0]]), requires_grad=True)
+    tanh = TanhFunction()
+    out = tanh(a)
+
+    expected = np.tanh(a.data)
+    assert np.allclose(out.data, expected, atol=1e-6), "Tanh forward failed"
+
+    grad_from_loss = Tensor(np.array([[1.0, 0.0]]))  # ∂L/∂tanh = [1, 0]
+    out.backward(grad_from_loss)
+
+    # Jv = (1 - tanh^2(x)) * v
+    v = np.array([1.0, 0.0])
+    grad_expected = (1 - np.tanh(a.data) ** 2) * v
+
+    assert np.allclose(a.grad, grad_expected.reshape(1, -1), atol=1e-6), f"Tanh backward incorrect.\nExpected: {grad_expected}\nGot: {a.grad}"
+

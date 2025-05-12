@@ -10,6 +10,7 @@ Date: 2025-04-26
 from typing import Tuple
 from litetorch.core.tensor import Tensor
 from litetorch.core.function import Function
+from litetorch.utils.linear_algebra import reduce_broadcast_shape
 
 
 class AddFunction(Function):
@@ -45,4 +46,22 @@ class AddFunction(Function):
         # dL/db = 1
         # The gradient of the sum is 1 for both inputs
         # This means that the gradient of the output with respect to each input is 1.
-        return grad_outputs[0], grad_outputs[0]
+        grad_output = grad_outputs[0].data
+        a, b = self.inputs
+        a_shape = a.shape
+        b_shape = b.shape
+
+        # Gradient for a: same shape as a
+        grad_a = grad_output
+        grad_b = grad_output
+
+        # Handle broadcasting for a
+        if grad_a.shape != a_shape:
+            grad_a = reduce_broadcast_shape(grad_a, a_shape)
+
+        # Handle broadcasting for b
+        if grad_b.shape != b_shape:
+            grad_b = reduce_broadcast_shape(grad_b, b_shape)
+
+        return Tensor(grad_a, requires_grad=False), Tensor(grad_b, requires_grad=False)
+

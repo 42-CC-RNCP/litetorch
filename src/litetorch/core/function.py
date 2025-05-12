@@ -44,6 +44,21 @@ class Function(ABC):
         """
         pass
 
+    def safe_backward(self, *grad_outputs: Tuple[Tensor]) -> Tuple[Tensor]:
+        grads = self.backward(*grad_outputs)
+
+        if not isinstance(grads, tuple):
+            grads = (grads,)
+
+        for idx, (grad, input) in enumerate(zip(grads, self.inputs)):
+            if grad.shape != input.shape:
+                raise ValueError(
+                    f"[{self.__class__.__name__}] Backward shape mismatch on input {idx}: "
+                    f"expected {input.shape}, got {grad.shape}"
+                )
+        return grads
+
+
     def __call__(self, *inputs: Tuple[Tensor]) -> Tensor:
         from litetorch.core.tensor import Tensor
 

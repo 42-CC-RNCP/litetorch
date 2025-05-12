@@ -47,12 +47,12 @@ class Tensor:
 
         grad = grad_output.data
         if grad.shape != self.data.shape:
-            grad = grad.sum(axis=0, keepdims=True)
+            raise ValueError(f"Backward shape mismatch: grad shape {grad.shape}, but tensor shape is {self.data.shape}")
         self.grad += grad
 
         if self.creator is not None:
             # Call the backward function of the creator
-            grads = self.creator.backward(Tensor(self.grad, requires_grad=False))
+            grads = self.creator.safe_backward(Tensor(self.grad, requires_grad=False))
             if not isinstance(grads, tuple):
                 grads = (grads,)
             for input_tensor, grad in zip(self.creation_args, grads):

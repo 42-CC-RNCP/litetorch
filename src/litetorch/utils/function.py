@@ -35,6 +35,9 @@ def sigmoid(x: np.ndarray) -> np.ndarray:
     Returns:
     - Sigmoid of the input array.
     """
+    # Clip the input to avoid overflow in exp function (e.g., exp(701) is overflow)
+    x = np.array(x, dtype=np.float64)
+    x = np.clip(x, -500, 500)
     return 1 / (1 + np.exp(-x))
 
 

@@ -26,6 +26,8 @@ class MSEFunction(Function):
         """
         self.input = input
         self.target = target
+
+        assert input.shape == target.shape, "Input and target must have the same shape"
         return Tensor(mse(input.data, target.data), requires_grad=input.auto_grad)
 
     def backward(self, *grad_outputs: Tensor) -> Tensor:

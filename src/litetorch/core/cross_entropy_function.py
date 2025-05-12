@@ -27,6 +27,9 @@ class CrossEntropyFunction(Function):
         """
         self.input = input
         self.target = target
+
+        assert input.shape == target.shape, "Input and target must have the same shape"
+
         self.probabilities = softmax(input.data)
 
         # Clip probabilities to avoid log(0)

@@ -10,6 +10,7 @@ Date: 2025-04-26
 from typing import Tuple
 from litetorch.core.function import Function
 from litetorch.core.tensor import Tensor
+from litetorch.utils.linear_algebra import reduce_broadcast_shape
 
 
 class DivFunction(Function):
@@ -47,4 +48,19 @@ class DivFunction(Function):
         # dL/da = 1/b
         # dL/db = -a/(b^2)
         # The gradient of the division is 1/b for a and -a/(b^2) for b
-        return grad_outputs[0] / self.inputs[1], -self.inputs[0] * grad_outputs[0] / (self.inputs[1] ** 2)
+        grad_output = grad_outputs[0].data
+        a = self.inputs[0]
+        b = self.inputs[1]
+
+        grad_a = grad_output / b.data
+        grad_b = grad_output * (-a.data / (b.data ** 2))
+
+        # Ensure that the gradients are of the same shape as the inputs
+        # Handle broadcasting for a
+        if grad_a.shape != a.shape:
+            grad_a = reduce_broadcast_shape(grad_a, a.shape)
+        # Handle broadcasting for b
+        if grad_b.shape != b.shape:
+            grad_b = reduce_broadcast_shape(grad_b, b.shape)
+
+        return Tensor(grad_a), Tensor(grad_b)

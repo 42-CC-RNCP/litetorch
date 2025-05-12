@@ -51,3 +51,16 @@ def test_mul_backward_broadcast():
 
     assert np.allclose(a.grad, expected_grad_a)
     assert np.allclose(b.grad, expected_grad_b)
+
+def test_div_backward_broadcast():
+    a = Tensor(np.array([[1.0, 2.0], [3.0, 4.0]]), requires_grad=True)
+    b = Tensor(np.array([[2.0, 3.0]]), requires_grad=True)  # (1,2)
+
+    out = a / b
+    out.backward(Tensor(np.ones_like(out.data)))  # ∂L/∂out = 1
+
+    expected_grad_a = np.array([[0.5, 1/3], [0.5, 1/3]])         # (2,2)
+    expected_grad_b = np.array([[-1.0, -0.66666667]])            # (1,2) ← sum over axis 0
+
+    assert np.allclose(a.grad, expected_grad_a, atol=1e-6)
+    assert np.allclose(b.grad, expected_grad_b, atol=1e-6)

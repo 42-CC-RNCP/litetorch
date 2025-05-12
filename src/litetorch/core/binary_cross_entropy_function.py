@@ -31,7 +31,11 @@ class BinaryCrossEntropyFunction(Function):
         self.input = input
         self.target = target
 
-        assert input.shape == target.shape, "Input and target must have the same shape"
+        if target.shape != input.shape:
+            try:
+                target.data = np.broadcast_to(target.data, input.shape)
+            except ValueError:
+                raise ValueError(f"[BinaryCrossEntropy] Shape mismatch: input.shape = {input.shape}, target.shape = {target.shape}")
 
         # Clip input to avoid log(0)
         input_data = np.clip(self.input.data, self.epsilon, 1 - self.epsilon)

@@ -122,3 +122,24 @@ def test_tahn():
 
     assert np.allclose(a.grad, grad_expected.reshape(1, -1), atol=1e-6), f"Tanh backward incorrect.\nExpected: {grad_expected}\nGot: {a.grad}"
 
+
+def test_bce_shape_handling():
+    from litetorch.core.binary_cross_entropy_function import BinaryCrossEntropyFunction
+
+    # Input and target with compatible but different shapes
+    input = Tensor(np.array([[0.9], [0.1], [0.8]], dtype=np.float32), requires_grad=True)  # shape (3,1)
+    target_flat = Tensor(np.array([1, 0, 1], dtype=np.float32))                            # shape (3,)
+    target_column = Tensor(np.array([[1], [0], [1]], dtype=np.float32))                   # shape (3,1)
+
+    # Should work even though shapes differ
+    loss_fn = BinaryCrossEntropyFunction()
+    loss_flat = loss_fn(input, target_flat)
+    loss_column = loss_fn(input, target_column)
+
+    # Forward values must be the same
+    assert np.allclose(loss_flat.data, loss_column.data, atol=1e-6), "BCE loss mismatch on shape-normalized targets"
+
+    # Backward should not fail
+    loss_flat.backward()
+    assert input.grad.shape == input.shape, "Gradient shape mismatch after BCE backward"
+

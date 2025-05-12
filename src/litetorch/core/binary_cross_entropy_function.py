@@ -33,8 +33,8 @@ class BinaryCrossEntropyFunction(Function):
 
         if target.shape != input.shape:
             try:
-                target.data = np.broadcast_to(target.data, input.shape)
-            except ValueError:
+                target = Tensor(np.broadcast_to(target.data.reshape(input.shape), input.shape))
+            except Exception:
                 raise ValueError(f"[BinaryCrossEntropy] Shape mismatch: input.shape = {input.shape}, target.shape = {target.shape}")
 
         # Clip input to avoid log(0)

@@ -25,6 +25,12 @@ class Sequential(Module, SaveLoadMixin):
         super().__init__()
         self.layers = layers
 
+        for i, layer in enumerate(self.layers):
+            if not isinstance(layer, Module):
+                raise TypeError(f"Layer {i} is not a valid Module instance.")
+            layer._name = f"layer_{i}"
+            self.add_module(layer._name, layer)
+
     def forward(self, x: Tensor) -> Tensor:
         """
         Perform the forward pass through the network.

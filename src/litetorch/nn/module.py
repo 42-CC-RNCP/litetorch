@@ -9,12 +9,13 @@ Date: 2025-04-24
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import List, Dict, Self
 from litetorch.core.tensor import Tensor
 
 
 class Module(ABC):
     def __init__(self):
+        self._training: bool = True
         self._parameters: Dict[str, Tensor] = {}
         self._modules: Dict[str, 'Module'] = {}
         self._name: str = self.__class__.__name__
@@ -26,6 +27,18 @@ class Module(ABC):
     @abstractmethod
     def get_config(self) -> dict:
         pass
+
+    def train(self, model: bool = True) -> Self:
+        """
+        Sets the module to training mode.
+        """
+        self._training = model
+        for module in self._modules.values():
+            module.train()
+        return self
+
+    def eval(self) -> Self:
+        self.train(False)
 
     def get_parameters(self) -> dict:
         """

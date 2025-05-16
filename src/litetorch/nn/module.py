@@ -8,6 +8,7 @@ Version: 0.0.1
 Date: 2025-04-24
 """
 
+import numpy as np
 from abc import ABC, abstractmethod
 from typing import List, Dict, Self
 from litetorch.core.tensor import Tensor
@@ -82,6 +83,10 @@ class Module(ABC):
                 param.grad[:] = 0.0
 
     def __call__(self, x) -> Tensor:
+        if isinstance(x, np.ndarray):
+            x = Tensor(x)
+        elif not isinstance(x, Tensor):
+            raise TypeError(f"{self._name} expected input of type Tensor or np.ndarray, got {type(x)}")
         return self.forward(x)
 
     def __repr__(self) -> str:

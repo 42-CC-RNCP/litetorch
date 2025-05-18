@@ -14,8 +14,10 @@ class ConfusionMatrixImage(FigureMetric):
     
     def __init__(self):
         super().__init__()
-        self.class_names = ["True Negative", "False Positive",
-                            "False Negative", "True Positive"]
+        # self.class_names = ["True Negative", "False Positive",
+        #                     "False Negative", "True Positive"]
+        self.class_names = [["Positive", "Negative"],
+                            ["Positive", "Negative"]]
 
     def __call__(self, trainer) -> "matplotlib.figure.Figure":
         """
@@ -40,11 +42,11 @@ class ConfusionMatrixImage(FigureMetric):
             y_true = np.concatenate((y_true, y_batch.data.ravel()))
             y_pred = np.concatenate((y_pred, preds))
 
-        cm = ConfusionMatrix()
+        cm = ConfusionMatrix()(y_true, y_pred)
         fig, ax = plt.subplots(figsize=(4, 4))
         sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-                    xticklabels=self.class_names,
-                    yticklabels=self.class_names,
+                    xticklabels=self.class_names[0],
+                    yticklabels=self.class_names[1],
                     ax=ax)
         ax.set_xlabel("Predicted")
         ax.set_ylabel("Actual")

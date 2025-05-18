@@ -19,6 +19,7 @@ ipywidgets = "*"
 notebook = "*"
 jupyterlab = "*"
 tensorboardx = "^2.6.2.2"
+sklite = {git = "https://github.com/42-CC-RNCP/sklite.git"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"

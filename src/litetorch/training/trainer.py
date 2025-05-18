@@ -40,9 +40,10 @@ class Trainer:
         self.val_losses = []
 
     def train(self):
+        self._dispatch_callbacks("ontrain_begin")
         for epoch in range(self.max_epochs):
+            self._dispatch_callbacks("on_epoch_begin")
             self.epoch = epoch
-            # Train for one epoch
             train_loss = self._train_one_epoch()
             self.train_losses.append(train_loss)
             val_loss = self._validate_one_epoch() if self.val_loader else None
@@ -55,11 +56,11 @@ class Trainer:
             if self.val_loader:
                 self.val_losses.append(val_loss)
 
-            for callback in self.callbacks:
-                callback.on_epoch_end(self)
-                if hasattr(callback, "early_stop") and callback.early_stop:
-                    print(f"Early stopping triggered at epoch {epoch + 1}.")
-                    return
+            self._dispatch_callbacks("on_epoch_end")
+            if any(getattr(cb, "early_stop", False) for cb in self.callbacks):
+                print(f"Early stopping triggered at epoch {epoch + 1}.")
+                break
+        self._dispatch_callbacks("on_train_end")
 
     def save_model(self, path: str = "saved_model.json") -> None:
         if hasattr(self.model, "save"):
@@ -67,9 +68,15 @@ class Trainer:
         else:
             raise TypeError("Model does not support saving. Make sure it inherits from SaveLoadMixin.")
 
+    def _dispatch_callbacks(self, hook: str):
+        for callback in self.callbacks:
+            if hasattr(callback, hook):
+                getattr(callback, hook)(self)
+
     def _train_one_epoch(self) -> float:
         epoch_loss = 0.0
         for X_batch, y_batch in self.train_loader:
+            self._dispatch_callbacks("on_batch_begin")
             # Forward pass
             y_pred = self.model(X_batch)
             loss = self.loss_fn(y_pred, y_batch)
@@ -82,6 +89,7 @@ class Trainer:
                 pass
             self.optimizer.step()
             epoch_loss += loss.data.item()
+            self._dispatch_callbacks("on_batch_begin")
         # average training loss = total_loss / number of batches
         return epoch_loss / len(self.train_loader)
 
@@ -97,7 +105,7 @@ class Trainer:
         return average_val_loss
 
     def __str__(self):
-        return f"batch_{self.train_loader.batch_size}_epochs_{self.max_epochs}_lr_{self.optimizer.lr}_loss_{self.loss_fn.__class__.__name__}"
+        return f"batch_{self.train_loader.batch_size}_epochs_{self.epoch}_lr_{self.optimizer.lr}_loss_{self.loss_fn.__class__.__name__}"
 
     def __repr__(self):
         return f"{self.__class__.__name__}(model={self.model}, optimizer={self.optimizer}, loss_fn={self.loss_fn}, train_loader={self.train_loader}, max_epochs={self.max_epochs})"

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict
 from tensorboardX import SummaryWriter
 from .base import Callback
 
@@ -7,7 +7,7 @@ class TensorboardLoggerCallback(Callback):
     """
     Tensorboard logger callback.
     """
-    def __init__(self, metrics: List[str], log_dir: str = "runs", flush_secs: int = 30):
+    def __init__(self, metrics: Dict, log_dir: str = "runs", flush_secs: int = 30):
         """
         Args:
             metrics (List[str]): List of metrics to log.
@@ -16,23 +16,18 @@ class TensorboardLoggerCallback(Callback):
         """
         super().__init__()
         self.metrics = metrics
+        self.log_dir = log_dir
         self.writer = SummaryWriter(log_dir=log_dir, flush_secs=flush_secs)
         
     def on_epoch_end(self, trainer):
-        """
-        Logs the metrics at the end of each epoch.
-        """
-        for metric in self.metrics:
-            if hasattr(trainer, metric):
-                value = getattr(trainer, metric)[-1]
-                self.writer.add_scalar(metric, value, trainer.epoch)
-            else:
-                print(f"Metric '{metric}' not found in trainer.")
-        self.writer.flush()
-        
+        epoch = trainer.epoch + 1
+        for name, fn in self.metrics.items():
+            try:
+                value = fn(trainer)
+                self.writer.add_scalar(name, value, epoch)
+            except Exception as e:
+                print(f"[TensorBoardLogger] Failed to log {name}: {e}")
+
     def on_train_end(self, trainer):
-        """
-        Closes the writer at the end of training.
-        """
         self.writer.close()
-        print("Tensorboard logs saved.")
+        print(f"[TensorBoardLogger] Saved logs to {self.log_dir}")

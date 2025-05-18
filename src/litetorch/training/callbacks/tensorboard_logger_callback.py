@@ -1,5 +1,6 @@
 from typing import Dict
 from tensorboardX import SummaryWriter
+from litetorch.metrics.base import ScalarMetric, FigureMetric
 from .base import Callback
 
 
@@ -25,14 +26,18 @@ class TensorboardLoggerCallback(Callback):
 
         for name, fn in self.metrics.items():
             try:
-                value = fn(trainer)
-                if "/" in name:
-                    tag, sub = name.split("/")
-                    if tag not in grouped_metrics:
-                        grouped_metrics[tag] = {}
-                    grouped_metrics[tag][sub] = value
-                else:
-                    self.writer.add_scalar(name, value, epoch)
+                if isinstance(fn, ScalarMetric):
+                    value = fn(trainer)
+                    if "/" in name:
+                        tag, sub = name.split("/")
+                        if tag not in grouped_metrics:
+                            grouped_metrics[tag] = {}
+                        grouped_metrics[tag][sub] = value
+                    else:
+                        self.writer.add_scalar(name, value, epoch)
+                elif isinstance(fn, FigureMetric):
+                    figure = fn(trainer)
+                    self.writer.add_figure(name, figure, epoch)
             except Exception as e:
                 print(f"[TensorBoardLogger] Failed to log {name}: {e}")
 

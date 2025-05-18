@@ -1,6 +1,7 @@
 import seaborn as sns
 import numpy as np
 import matplotlib
+from typing import Optional, List
 from matplotlib import pyplot as plt
 from sklite.metrics import ConfusionMatrix
 from litetorch.core.tensor import Tensor
@@ -12,12 +13,11 @@ class ConfusionMatrixImage(FigureMetric):
     Confusion Matrix metric for visualizing the performance of a classification model.
     """
     
-    def __init__(self):
+    def __init__(self, class_names=Optional[List[str]]):
         super().__init__()
-        # self.class_names = ["True Negative", "False Positive",
-        #                     "False Negative", "True Positive"]
-        self.class_names = [["Positive", "Negative"],
-                            ["Positive", "Negative"]]
+        self.class_names = ["Negative", "Positive"]  # if label 0 = Negative, 1 = Positive
+        if class_names is not None:
+            self.class_names = class_names
 
     def __call__(self, trainer) -> "matplotlib.figure.Figure":
         """
@@ -45,8 +45,8 @@ class ConfusionMatrixImage(FigureMetric):
         cm = ConfusionMatrix()(y_true, y_pred)
         fig, ax = plt.subplots(figsize=(4, 4))
         sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-                    xticklabels=self.class_names[0],
-                    yticklabels=self.class_names[1],
+                    xticklabels=self.class_names,
+                    yticklabels=self.class_names,
                     ax=ax)
         ax.set_xlabel("Predicted")
         ax.set_ylabel("Actual")

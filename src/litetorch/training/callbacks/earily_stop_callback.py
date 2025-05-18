@@ -17,14 +17,14 @@ class EarlyStopCallback(Callback):
         self.patience = patience
         self.monitor = monitor
         self.mode = mode
-        self.best_score = None
+        self.best_score = float('inf') if mode == 'min' else float('-inf')
         self.early_stop = False
         
         if self.mode not in ['min', 'max']:
             raise ValueError("mode should be one of {'min', 'max'}")
         
     def on_epoch_end(self, trainer):
-        current = getattr(trainer, self.monitor)
+        current = getattr(trainer, self.monitor)[-1]  # Get the last value of the monitored metric
         improved = (current < self.best_score) if self.mode == "min" else (current > self.best_score)
         
         if self.best_score is None or improved:

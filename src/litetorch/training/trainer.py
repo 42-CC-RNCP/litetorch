@@ -12,7 +12,7 @@ from litetorch.nn.module import Module
 from litetorch.optim.base import Optimizer
 from litetorch.nn.loss import Loss
 from litetorch.data.dataloader import DataLoader
-from .callback.base import Callback
+from .callbacks.base import Callback
 
 
 class Trainer:
@@ -38,8 +38,6 @@ class Trainer:
         self.epoch = 0
         self.train_losses = []
         self.val_losses = []
-        self.best_val_loss = float('inf')
-        self.no_improv_epochs = 0
 
     def train(self):
         for epoch in range(self.max_epochs):

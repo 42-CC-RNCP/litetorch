@@ -21,12 +21,24 @@ class TensorboardLoggerCallback(Callback):
         
     def on_epoch_end(self, trainer):
         epoch = trainer.epoch + 1
+        grouped_metrics = {}
+
         for name, fn in self.metrics.items():
             try:
                 value = fn(trainer)
-                self.writer.add_scalar(name, value, epoch)
+                if "/" in name:
+                    tag, sub = name.split("/")
+                    if tag not in grouped_metrics:
+                        grouped_metrics[tag] = {}
+                    grouped_metrics[tag][sub] = value
+                else:
+                    self.writer.add_scalar(name, value, epoch)
             except Exception as e:
                 print(f"[TensorBoardLogger] Failed to log {name}: {e}")
+
+        # Now log grouped scalars
+        for tag, sub_metrics in grouped_metrics.items():
+            self.writer.add_scalars(tag, sub_metrics, epoch)
 
     def on_train_end(self, trainer):
         self.writer.close()

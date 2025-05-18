@@ -7,13 +7,12 @@ Version: 0.0.1
 Date: 2025-05-03
 """
 
-import numpy as np
-from typing import Callable, Optional, List
+from typing import Optional, List
 from litetorch.nn.module import Module
-from litetorch.core.tensor import Tensor
 from litetorch.optim.base import Optimizer
 from litetorch.nn.loss import Loss
 from litetorch.data.dataloader import DataLoader
+from .callback.base import Callback
 
 
 class Trainer:
@@ -24,9 +23,8 @@ class Trainer:
                  train_loader: DataLoader,
                  max_epochs: int = 10,
                  val_loader: Optional[DataLoader] = None,
-                 early_stopping: Optional[int] = None,
                  clip_grad: Optional[float] = None,
-                 callbacks: Optional[List[Callable]] = None,
+                 callbacks: Optional[List[Callback]] = None,
                  ):
         self.model = model
         self.optimizer = optimizer
@@ -34,9 +32,7 @@ class Trainer:
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.max_epochs = max_epochs
-        self.early_stopping = early_stopping
         self.clip_grad = clip_grad
-        # TODO: Implement callback functionality
         self.callbacks = callbacks if callbacks is not None else []
 
         self.epoch = 0
@@ -60,16 +56,12 @@ class Trainer:
                 print()
             if self.val_loader:
                 self.val_losses.append(val_loss)
-                # Early stopping
-                if val_loss < self.best_val_loss:
-                    self.best_val_loss = val_loss
-                    self.no_improv_epochs = 0
-                else:
-                    self.no_improv_epochs += 1
-                    if self.early_stopping and self.no_improv_epochs >= self.early_stopping:
-                        print(f"Early stopping at epoch {epoch}")
-                        break
 
+            for callback in self.callbacks:
+                callback.on_epoch_end(self)
+                if hasattr(callback, "early_stop") and callback.early_stop:
+                    print(f"Early stopping triggered at epoch {epoch + 1}.")
+                    return
 
     def save_model(self, path: str = "saved_model.json") -> None:
         if hasattr(self.model, "save"):

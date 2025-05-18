@@ -40,7 +40,7 @@ class Trainer:
         self.val_losses = []
 
     def train(self):
-        self._dispatch_callbacks("ontrain_begin")
+        self._dispatch_callbacks("on_train_begin")
         for epoch in range(self.max_epochs):
             self._dispatch_callbacks("on_epoch_begin")
             self.epoch = epoch
@@ -89,7 +89,7 @@ class Trainer:
                 pass
             self.optimizer.step()
             epoch_loss += loss.data.item()
-            self._dispatch_callbacks("on_batch_begin")
+            self._dispatch_callbacks("on_batch_end")
         # average training loss = total_loss / number of batches
         return epoch_loss / len(self.train_loader)
 

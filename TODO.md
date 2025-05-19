@@ -1,3 +1,35 @@
+[Recorded by: 2025-05-19]
+
+When model overfitting, I need some tools to check the model performance and need some techniques to prevent overfitting.
+
+### TODO List
+
+- [ ] Implement the `Dropout` layer
+- [ ] Implement the `BatchNormalization` layer
+- [ ] Enhance the `EarlyStopping` callback
+    - The `EarlyStopping` callback should monitor the validation loss and stop the training if the validation loss does not improve for a certain number of epochs.
+    - The `EarlyStopping` callback should also save the best model weights.
+- Implement others performance metrics
+    - [x] `accuracy`
+    - [x] `confusion matrix`
+    - [ ] `precision`
+    - [ ] `recall`
+    - [ ] `f1-score`
+- [ ] Implement the `Tuner` class
+    - The `Tuner` class should be used to tune the hyperparameters of the model.
+    - The `Tuner` class should support the following hyperparameters:
+        - learning rate
+        - batch size
+        - number of epochs
+        - optimizer
+        - loss function
+        - model architecture
+    - The `Tuner` class should support the following tuning methods:
+        - grid search
+        - random search
+        - Bayesian optimization
+- [ ] Support callback function for MLflow api
+
 [Recorded by: 2025-05-15]
 
 ### TODO List
@@ -31,11 +63,11 @@
 - [ ] Add test cases for the data loader
 - [ ] Add test cases for the trainer
     - consider to embed the trainer into the model as `model.fit()`
-- [ ] Implement the `logger` and support output format CSV, JSON, and tensorboard
-- [ ] Implement the `EarlyStopping` callback
+- [x] Implement the `logger` and support output format CSV, JSON, and tensorboard
+- [x] Implement the `EarlyStopping` callback
 - [ ] Implement the `ModelCheckpoint` callback
 - [ ] Implement the `gradient clipping` in the trainer
-- [ ] Implement the utility functions to plot the training and validation loss
+- [x] Implement the utility functions to plot the training and validation loss
 - [ ] ~~Implement the `data augmentation` for the data loader~~
     - by the desgin mindset, the nn framework should not be responsible for the data preprocessing
 - [ ] ~~Implement the `data normalization` for the data loader~~

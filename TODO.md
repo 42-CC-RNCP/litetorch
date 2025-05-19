@@ -34,7 +34,7 @@ When model overfitting, I need some tools to check the model performance and nee
 
 ### TODO List
 
-- [ ] Move the `split` functions to the another repository
+- [x] Move the `split` functions to the another repository
     - The `split` functions are used to split the dataset into training and validation sets.
     - It is not a part of the neural network framework, so it should be moved to another repository.
 - [ ] Support `model.train()` and `model.eval()` mode as the PyTorch

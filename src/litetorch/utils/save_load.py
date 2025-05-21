@@ -51,6 +51,7 @@ class SaveLoadMixin:
     def load(cls, filepath: str) -> None:
         from litetorch.nn.activation import ReLU, Sigmoid, Tanh, Softmax, LeakyReLU
         from litetorch.nn.linear import Linear
+        from litetorch.nn.dropout import Dropout
         from litetorch.nn.sequential import Sequential
 
         with open(filepath, 'r') as f:
@@ -64,6 +65,8 @@ class SaveLoadMixin:
 
             if layer_type == "Linear":
                 layer = Linear(**{k: v for k, v in layer_config.items() if k != "type"})
+            elif layer_type == "Dropout":
+                layer = Dropout(**{k: v for k, v in layer_config.items() if k != "type"})
             elif layer_type == "ReLU":
                 layer = ReLU()
             elif layer_type == "Sigmoid":

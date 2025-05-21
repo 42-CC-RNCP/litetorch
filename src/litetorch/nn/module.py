@@ -29,11 +29,11 @@ class Module(ABC):
     def get_config(self) -> dict:
         pass
 
-    def train(self, model: bool = True) -> Self:
+    def train(self, mode: bool = True) -> Self:
         """
         Sets the module to training mode.
         """
-        self._training = model
+        self._training = mode
         for module in self._modules.values():
             module.train()
         return self

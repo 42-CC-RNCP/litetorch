@@ -59,6 +59,12 @@ class Tensor:
                 if input_tensor.auto_grad:
                     input_tensor.backward(grad)
 
+    def copy(self) -> 'Tensor':
+        """
+        Create a copy of the Tensor object.
+        """
+        return Tensor(self.data.copy(), requires_grad=self.auto_grad)
+
     def __add__(self, other: 'Tensor'):
         """
         Addition operator overload.
@@ -96,6 +102,8 @@ class Tensor:
         """
         Division operator overload.
         """
+        if isinstance(other, (int, float)):
+            other = Tensor(np.array(other), requires_grad=False)
         if isinstance(other, Tensor):
             from litetorch.core.div_function import DivFunction
             result = DivFunction()(self, other)

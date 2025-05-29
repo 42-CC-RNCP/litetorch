@@ -69,7 +69,7 @@ def test_batchnorm_eval_mode():
 
     x_pt = torch.tensor(input_np)
     bn_pt = nn.BatchNorm1d(3, eps=eps, affine=True)
-    bn_pt.eval()  # 設為 inference 模式
+    bn_pt.eval()
 
     with torch.no_grad():
         bn_pt.running_mean.copy_(torch.tensor(running_mean))

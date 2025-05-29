@@ -4,8 +4,8 @@ When model overfitting, I need some tools to check the model performance and nee
 
 ### TODO List
 
-- [ ] Implement the `Dropout` layer
-- [ ] Implement the `BatchNormalization` layer
+- [x] Implement the `Dropout` layer
+- [x] Implement the `BatchNormalization` layer
 - [ ] Enhance the `EarlyStopping` callback
     - The `EarlyStopping` callback should monitor the validation loss and stop the training if the validation loss does not improve for a certain number of epochs.
     - The `EarlyStopping` callback should also save the best model weights.

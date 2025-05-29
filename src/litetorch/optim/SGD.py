@@ -12,6 +12,7 @@ from typing import List, Dict
 from litetorch.core.tensor import Tensor
 from litetorch.optim.base import Optimizer
 
+
 class SGD(Optimizer):
     def __init__(self,
                  parameters: List[Tensor],

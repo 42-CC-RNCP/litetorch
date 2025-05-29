@@ -165,3 +165,33 @@ def test_ce_shape_handling():
 
     loss.backward()
     assert logits.grad.shape == logits.shape, "Grad shape should match logits shape"
+
+
+def test_pow_forward():
+    from litetorch.core.pow_function import PowFunction
+
+    a = Tensor(np.array([[2.0, 3.0], [4.0, 5.0]]), requires_grad=False)
+    b = 2.0  # scalar exponent
+
+    pow_fn = PowFunction()
+    out = pow_fn.forward(a, b)
+
+    expected = np.array([[4.0, 9.0], [16.0, 25.0]])
+    assert np.allclose(out.data, expected), "Pow forward failed"
+    
+
+def test_pow_backward():
+    from litetorch.core.pow_function import PowFunction
+
+    a = Tensor(np.array([[2.0, 3.0], [4.0, 5.0]]), requires_grad=True)
+    b = 2.0  # scalar exponent
+
+    pow_fn = PowFunction()
+    out = pow_fn(a, b)
+
+    # Backward pass with gradient of 1
+    out.backward(Tensor(np.ones_like(out.data)))
+
+    expected_grad_a = b * (a.data ** (b - 1))  # more general and accurate
+
+    assert np.allclose(a.grad, expected_grad_a), "Pow backward failed"

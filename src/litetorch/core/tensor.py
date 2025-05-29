@@ -111,7 +111,6 @@ class Tensor:
         else:
             raise TypeError("Unsupported operand type(s) for /: 'Tensor' and '{}'".format(type(other)))
 
-
     def __matmul__(self, other: 'Tensor'):
         """
         Matrix multiplication operator overload.
@@ -122,6 +121,17 @@ class Tensor:
             return result
         else:
             raise TypeError("Unsupported operand type(s) for *: 'Tensor' and '{}'".format(type(other)))
+
+    def __pow__(self, power):
+        """
+        Power operator overload.
+        Raises the tensor to the specified power.
+        """
+        if isinstance(power, (int, float)):
+            from litetorch.core.pow_function import PowFunction
+            return PowFunction()(self, power)
+        else:
+            raise TypeError("Unsupported operand type(s) for **: 'Tensor' and '{}'".format(type(power)))
 
     @property
     def T(self) -> 'Tensor':

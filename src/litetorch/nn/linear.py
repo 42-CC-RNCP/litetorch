@@ -12,8 +12,10 @@ from litetorch.core.tensor import Tensor
 from litetorch.core.add_function import AddFunction
 from litetorch.core.matmul_function import MatMulFunction
 from litetorch.nn.module import Module
+from litetorch.utils.registry import register_layer
 
 
+@register_layer("Linear")
 class Linear(Module):
     """
     Linear layer (fully connected layer) in a neural network.

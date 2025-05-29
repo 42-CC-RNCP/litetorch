@@ -10,8 +10,10 @@ Date: 2025-05-21
 import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.module import Module
+from litetorch.utils.registry import register_layer
 
 
+@register_layer("Dropout")
 class Dropout(Module):
     """
     Dropout layer in a neural network.

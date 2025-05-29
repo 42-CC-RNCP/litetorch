@@ -14,8 +14,10 @@ from litetorch.core.sigmoid_function import SigmoidFunction
 from litetorch.core.tanh_function import TanhFunction
 from litetorch.core.softmax_function import SoftmaxFunction
 from litetorch.core.leaky_relu_function import LeakyReLUFunction
+from litetorch.utils.registry import register_layer
 
 
+@register_layer("ReLU")
 class ReLU(Module):
     def forward(self, input: Tensor) -> Tensor:
         return ReLUFunction()(input)
@@ -24,6 +26,7 @@ class ReLU(Module):
         return {"type": "ReLU"}
 
 
+@register_layer("Sigmoid")
 class Sigmoid(Module):
     def forward(self, input: Tensor) -> Tensor:
         return SigmoidFunction()(input)
@@ -32,6 +35,7 @@ class Sigmoid(Module):
         return {"type": "Sigmoid"}
 
 
+@register_layer("Tanh")
 class Tanh(Module):
     def forward(self, input: Tensor) -> Tensor:
         return TanhFunction()(input)
@@ -40,6 +44,7 @@ class Tanh(Module):
         return {"type": "Tanh"}
 
 
+@register_layer("Softmax")
 class Softmax(Module):
     def __init__(self, dim: int = -1):
         super().__init__()
@@ -52,6 +57,7 @@ class Softmax(Module):
         return {"type": "Softmax", "dim": self.dim}
 
 
+@register_layer("LeakyReLU")
 class LeakyReLU(Module):
     def __init__(self, negative_slope: float = 0.01):
         super().__init__()

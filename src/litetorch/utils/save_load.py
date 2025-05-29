@@ -24,8 +24,8 @@ Date: 2025-05-02
 """
 
 import json
-import numpy as np
 from typing import List, Dict
+from litetorch.utils.registry import LAYER_REGISTRY
 
 
 class SaveLoadMixin:
@@ -49,9 +49,6 @@ class SaveLoadMixin:
 
     @classmethod
     def load(cls, filepath: str) -> None:
-        from litetorch.nn.activation import ReLU, Sigmoid, Tanh, Softmax, LeakyReLU
-        from litetorch.nn.linear import Linear
-        from litetorch.nn.dropout import Dropout
         from litetorch.nn.sequential import Sequential
 
         with open(filepath, 'r') as f:
@@ -63,22 +60,10 @@ class SaveLoadMixin:
         for layer_config in arch:
             layer_type = layer_config["type"]
 
-            if layer_type == "Linear":
-                layer = Linear(**{k: v for k, v in layer_config.items() if k != "type"})
-            elif layer_type == "Dropout":
-                layer = Dropout(**{k: v for k, v in layer_config.items() if k != "type"})
-            elif layer_type == "ReLU":
-                layer = ReLU()
-            elif layer_type == "Sigmoid":
-                layer = Sigmoid()
-            elif layer_type == "Tanh":
-                layer = Tanh()
-            elif layer_type == "Softmax":
-                layer = Softmax()
-            elif layer_type == "LeakyReLU":
-                layer = LeakyReLU(**{k: v for k, v in layer_config.items() if k != "type"})
-            else:
-                raise ValueError(f"Unknown layer type: {layer_type}")
+            if layer_type not in LAYER_REGISTRY:
+                raise ValueError(f"Layer type '{layer_type}' not registered. Available types: {list(LAYER_REGISTRY.keys())}")
+            layer_class = LAYER_REGISTRY[layer_type]
+            layer : Module = layer_class(**{k: v for k, v in layer_config.items() if k != "type"})
             layers.append(layer)
 
         model = Sequential(*layers)

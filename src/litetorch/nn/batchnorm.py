@@ -2,8 +2,10 @@ import numpy as np
 from litetorch.core.tensor import Tensor
 from litetorch.nn.module import Module
 from litetorch.core.batch_norm_function import BatchNorm1DFunction
+from litetorch.utils.registry import register_layer
 
 
+@register_layer("BatchNorm1d")
 class BatchNorm1d(Module):
     def __init__(self, num_features: int, eps: float = 1e-5):
         super().__init__()

@@ -13,7 +13,7 @@ from litetorch.core.tensor import Tensor
 from litetorch.core.function import Function
 
 
-class BatchNormFunction(Function):
+class BatchNorm1DFunction(Function):
     def __init__(self, epsilon: float = 1e-5):
         super().__init__()
         self.eps = epsilon

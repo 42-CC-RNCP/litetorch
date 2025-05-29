@@ -50,6 +50,11 @@ class SaveLoadMixin:
     @classmethod
     def load(cls, filepath: str) -> None:
         from litetorch.nn.sequential import Sequential
+        # Make sure to import all layer classes to register them
+        from litetorch.nn.linear import Linear
+        from litetorch.nn.activation import ReLU, Sigmoid, Tanh, Softmax, LeakyReLU
+        from litetorch.nn.dropout import Dropout
+        from litetorch.nn.batchnorm import BatchNorm1d
 
         with open(filepath, 'r') as f:
             model_dict = json.load(f)

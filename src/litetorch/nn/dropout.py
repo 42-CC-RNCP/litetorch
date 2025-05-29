@@ -47,7 +47,7 @@ class Dropout(Module):
         Returns the configuration of the Dropout layer.
         """
         return {
-            "type": self._name,
+            "type": "Dropout",
             "p": self.p
         }
 

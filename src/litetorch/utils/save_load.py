@@ -24,9 +24,20 @@ Date: 2025-05-02
 """
 
 import json
+import numpy as np
 from typing import List, Dict
 from litetorch.utils.registry import LAYER_REGISTRY
 
+
+def to_serializable(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: to_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [to_serializable(v) for v in obj]
+    else:
+        return obj
 
 class SaveLoadMixin:
     def save(self, filepath: str, with_params = True) -> None:
@@ -35,7 +46,9 @@ class SaveLoadMixin:
 
         for i, layer in enumerate(self.layers):
             arch.append(layer.get_config())
-            params[f"layer_{i}"] = layer.get_parameters()
+            raw_params = layer.get_parameters()
+            serializable_params = to_serializable(raw_params)
+            params[f"layer_{i}"] = serializable_params
 
         model_dict = {
             "architecture": arch,
